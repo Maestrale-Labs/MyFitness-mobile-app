@@ -67,6 +67,7 @@ export default function RootLayout() {
           <Stack.Screen name="profile/name" />
           <Stack.Screen name="profile/theme" />
           <Stack.Screen name="profile/language" />
+          <Stack.Screen name="profile/feedback" />
           <Stack.Screen name="profile/legal/[document]" />
         </Stack>
       </ThemeProvider>

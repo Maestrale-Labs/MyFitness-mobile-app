@@ -76,6 +76,12 @@ Decise con Valerio il 30 ottobre 2026. Il percorso dell'utente (schede scelte, a
 
 Ogni installazione ha un codice casuale, senza dati personali. Si possono disattivare da Profilo › Privacy. Privacy policy e termini lo spiegano. Tutti i dettagli (tabelle, viste, query) sono in `docs/analytics.md`.
 
+### Feedback
+
+Deciso con Valerio il 30 ottobre 2026. Da Profilo › Informazioni › «Invia un feedback» chiunque, anche senza account, può mandare un messaggio. Si sceglie una categoria (Problema, Nuova funzionalità, Idea, Altro) e si scrive un testo di almeno 10 caratteri (al massimo 5.000, solo per proteggere la tabella). Non ci sono limiti al numero di invii: se arriva spam se ne riparla.
+
+I messaggi finiscono nella tabella **`public.feedbacks`** su Supabase, che Valerio legge dal Table Editor. L'app può solo scrivere. Con il messaggio si salvano versione dell'app, sistema, lingua, `is_dev` (vero se inviato da Expo Go) e, se le statistiche sono attive, il codice anonimo dell'installazione, utile se servirà bloccare lo spam. Migrazione: `supabase/migrations/20261030190000_create_feedbacks.sql`; codice: `src/features/feedback/api.ts` e `src/app/profile/feedback.tsx`.
+
 ### Account e uso senza registrazione
 
 Deciso con Valerio il 30 ottobre 2026:
@@ -211,6 +217,7 @@ Decise il 30 ottobre 2026:
 10. **Allenamenti per primi e schede a giorni.** Valerio chiede di mettere Allenamenti come prima sezione e di dividere le schede per giorni (Giorno 1, 2, 3) invece che in allenamento A e B, «pazienza se giorno 1 è uguale al giorno 3».
 11. **«Schede».** Valerio fa rinominare la sezione «I miei allenamenti» in «Schede», perché lì ci sono le schede. Chiede anche se si può già «aggiungere una scheda al proprio percorso» e vederla in una home, o se serve prima il login.
 12. **Statistiche anonime.** Valerio vuole sapere quante persone usano l'app senza obbligarle a registrarsi. Si decide: percorso salvato sul telefono, e un contatore anonimo su Supabase con installazioni, utenti attivi, ritorni ed eventi. Si collega la CLI di Supabase, si scrive la migrazione `analytics`, si aggiungono il tracciamento nell'app, l'interruttore nel profilo e i testi in privacy e termini.
+13. **Feedback.** Valerio chiede di poter ricevere feedback anche da chi non è registrato. Si aggiunge la pagina «Invia un feedback» nel profilo, con categoria e minimo 10 caratteri, senza limiti di invio, e la tabella `public.feedbacks` su Supabase (applicata e provata).
 
 ### Richiesta iniziale (testo integrale)
 

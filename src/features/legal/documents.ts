@@ -74,6 +74,13 @@ export const legalDocuments: Record<LegalDocumentId, LegalDocument> = {
         },
       },
       {
+        heading: { it: 'Feedback', en: 'Feedback' },
+        body: {
+          it: 'Se ci invii un feedback dal profilo, salviamo il testo che scrivi, la categoria scelta, la versione dell’app, il sistema operativo, la lingua del dispositivo e, se le statistiche sono attive, il codice casuale descritto sopra. Il feedback è anonimo: ti chiediamo di non scrivere dati personali nel messaggio.',
+          en: 'If you send us feedback from your profile, we store the text you write, the category you pick, the app version, the operating system, the device language and, if statistics are on, the random code described above. Feedback is anonymous: please don’t include personal data in your message.',
+        },
+      },
+      {
         heading: { it: 'Disattivare le statistiche', en: 'Turning statistics off' },
         body: {
           it: 'Puoi disattivare le statistiche in qualsiasi momento da Profilo › Statistiche anonime: da quel momento l’app non invia più nulla e cancella gli eventi non ancora inviati.',

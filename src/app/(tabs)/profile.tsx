@@ -111,6 +111,11 @@ export default function ProfileScreen() {
         <SectionLabel>{t('profile.sectionInfo')}</SectionLabel>
         <Card>
           <SettingsRow
+            icon={icons.feedback}
+            label={t('profile.feedback')}
+            onPress={() => router.push('/profile/feedback')}
+          />
+          <SettingsRow
             icon={icons.version}
             label={t('profile.version')}
             value={Constants.expoConfig?.version}

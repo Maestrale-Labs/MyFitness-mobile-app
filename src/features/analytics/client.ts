@@ -134,6 +134,11 @@ export async function flush() {
   }
 }
 
+/** The anonymous install code, or null when statistics are turned off. */
+export async function getInstallIdIfEnabled() {
+  return useSettings.getState().analyticsEnabled ? getInstallId() : null;
+}
+
 /** Forgets the queued events, e.g. when statistics are turned off. */
 export async function clearQueue() {
   const events = await loadQueue();
