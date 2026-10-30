@@ -26,6 +26,8 @@ export const en: Translations = {
     secondaryMuscles: 'Secondary muscles',
     equipment: 'Equipment',
     bodyPart: 'Body part',
+    animationNew: 'New (prototype)',
+    animationOriginal: 'Original',
     details: 'Details',
     howTo: 'How to do it',
     mediaCredit: 'Animation © {{credit}}',

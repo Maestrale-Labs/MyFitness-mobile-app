@@ -149,7 +149,7 @@ Deciso con Valerio il 30 ottobre 2026:
 ## Domande ancora aperte
 
 - **Nome dell'app:** per ora resta «Fitness» (decisione di Valerio). Si rivede prima di andare live e di creare l'app su App Store Connect, anche perché «Fitness» è il nome dell'app di Apple. Se cambia, basta toccare `name` in `app.json`; slug, bundle ID e progetto Expo sono identificativi interni e possono restare. Icona e splash sono ancora quelli del template Expo.
-- **Animazioni:** licenza Gym visual, oppure un'altra fonte per le immagini?
+- **Animazioni:** licenza Gym visual, oppure animazioni nostre? Le GIF del dataset vanno a scatti già all'origine (il lat pulldown ha 12 fotogrammi a 180×180 px, con pause di 1 s). Ricalcarle o interpolarle senza licenza non si può. Il 30 ottobre 2026 c'è un **prototipo nostro** per il lat pulldown: una figura SVG vista di fronte, animata con Reanimated a 60 fps (`src/features/exercises/animations/`). Nel dettaglio c'è l'interruttore «Nuova / Originale» per confrontarle. Valerio deve vederlo sull'iPhone e decidere se proseguire su questa strada.
 - **Testi legali** definitivi e URL della privacy policy.
 - **Progetto Supabase:** creato, con le migrazioni del catalogo pronte; ancora da collegare alla CLI, applicare e usare nell'app (vedi «Supabase»).
 - **Struttura delle schede:** confermare la proposta della tabella unica per schede nostre e personali (vedi «Account e uso senza registrazione»).

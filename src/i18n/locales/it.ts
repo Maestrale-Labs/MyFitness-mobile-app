@@ -25,6 +25,8 @@ export const it = {
     secondaryMuscles: 'Muscoli secondari',
     equipment: 'Attrezzatura',
     bodyPart: 'Zona',
+    animationNew: 'Nuova (prototipo)',
+    animationOriginal: 'Originale',
     details: 'Dettagli',
     howTo: 'Esecuzione',
     mediaCredit: 'Animazione © {{credit}}',
