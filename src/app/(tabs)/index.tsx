@@ -10,7 +10,7 @@ import { Spacing } from '@/constants/theme';
 import { ExerciseRow } from '@/features/exercises/components/exercise-row';
 import { useExercises } from '@/features/exercises/queries';
 import { matchesQuery } from '@/features/exercises/search';
-import type { BodyPart } from '@/features/exercises/types';
+import { muscleGroups, type MuscleGroup } from '@/features/exercises/types';
 import { makeStyles } from '@/hooks/use-styles';
 import { useTabBarInset } from '@/hooks/use-tab-bar-inset';
 import { useTheme } from '@/hooks/use-theme';
@@ -22,17 +22,18 @@ export default function ExercisesScreen() {
   const { t } = useTranslation();
   const { data: exercises = [], isPending, isError, refetch } = useExercises();
   const [query, setQuery] = useState('');
-  const [bodyPart, setBodyPart] = useState<BodyPart | null>(null);
+  const [group, setGroup] = useState<MuscleGroup | null>(null);
 
-  // Only offer filters that match at least one exercise.
-  const bodyParts = useMemo(
-    () => [...new Set(exercises.map((exercise) => exercise.bodyPart))],
+  // Only offer the groups that have at least one exercise, in their fixed order.
+  const groups = useMemo(
+    () =>
+      muscleGroups.filter((item) => exercises.some((exercise) => exercise.muscleGroup === item)),
     [exercises],
   );
 
   const results = exercises.filter(
     (exercise) =>
-      (bodyPart === null || exercise.bodyPart === bodyPart) && matchesQuery(exercise, query),
+      (group === null || exercise.muscleGroup === group) && matchesQuery(exercise, query),
   );
 
   const title = (
@@ -95,15 +96,15 @@ export default function ExercisesScreen() {
               contentContainerStyle={styles.chips}>
               <Chip
                 label={t('exercises.filterAll')}
-                selected={bodyPart === null}
-                onPress={() => setBodyPart(null)}
+                selected={group === null}
+                onPress={() => setGroup(null)}
               />
-              {bodyParts.map((part) => (
+              {groups.map((item) => (
                 <Chip
-                  key={part}
-                  label={t(`bodyPart.${part}`)}
-                  selected={bodyPart === part}
-                  onPress={() => setBodyPart(bodyPart === part ? null : part)}
+                  key={item}
+                  label={t(`muscleGroup.${item}`)}
+                  selected={group === item}
+                  onPress={() => setGroup(group === item ? null : item)}
                 />
               ))}
             </ScrollView>

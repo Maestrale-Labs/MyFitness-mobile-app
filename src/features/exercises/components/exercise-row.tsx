@@ -41,7 +41,8 @@ export function ExerciseRow({ exercise }: { exercise: Exercise }) {
                   {exercise.name[locale]}
                 </Text>
                 <Text numberOfLines={1} style={styles.meta}>
-                  {t(`bodyPart.${exercise.bodyPart}`)} · {t(`equipment.${exercise.equipment}`)}
+                  {t(`muscleGroup.${exercise.muscleGroup}`)} ·{' '}
+                  {t(`equipment.${exercise.equipment}`)}
                 </Text>
                 <View style={styles.tag}>
                   <Text style={styles.tagText}>{t(`muscle.${exercise.targetMuscle}`)}</Text>

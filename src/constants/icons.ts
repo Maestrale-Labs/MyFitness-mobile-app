@@ -37,7 +37,7 @@ export const icons = {
   search: Search01Icon,
   clear: CancelCircleIcon,
   // exercise facts
-  bodyPart: WorkoutRunIcon,
+  muscleGroup: WorkoutRunIcon,
   equipment: Dumbbell01Icon,
   targetMuscle: Target02Icon,
   secondaryMuscles: BodyPartMuscleIcon,

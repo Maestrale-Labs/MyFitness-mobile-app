@@ -5,11 +5,17 @@ import type { Translations } from '@/i18n/locales/it';
 export type BodyPart = keyof Translations['bodyPart'];
 export type Equipment = keyof Translations['equipment'];
 export type Muscle = keyof Translations['muscle'];
+export type MuscleGroup = keyof Translations['muscleGroup'];
+
+/** The muscle groups the exercise list is filtered by, in display order. */
+export const muscleGroups: MuscleGroup[] = ['back', 'legs', 'glutes', 'biceps', 'chest'];
 
 export type Exercise = {
   /** Stable slug, used in URLs. */
   id: string;
   name: Localized;
+  /** Our grouping for browsing, chosen per exercise (the dataset's target can differ). */
+  muscleGroup: MuscleGroup;
   bodyPart: BodyPart;
   equipment: Equipment;
   targetMuscle: Muscle;

@@ -24,9 +24,7 @@ export const it = {
     targetMuscle: 'Muscolo principale',
     secondaryMuscles: 'Muscoli secondari',
     equipment: 'Attrezzatura',
-    bodyPart: 'Zona',
-    animationNew: 'Nuova (prototipo)',
-    animationOriginal: 'Originale',
+    muscleGroup: 'Gruppo muscolare',
     details: 'Dettagli',
     howTo: 'Esecuzione',
     mediaCredit: 'Animazione © {{credit}}',
@@ -61,6 +59,13 @@ export const it = {
   legal: {
     draftNotice: 'Testo provvisorio: la versione definitiva sarà pubblicata prima del rilascio.',
     lastUpdated: 'Ultimo aggiornamento: {{date}}',
+  },
+  muscleGroup: {
+    back: 'Schiena',
+    legs: 'Gambe',
+    glutes: 'Glutei',
+    biceps: 'Bicipiti',
+    chest: 'Petto',
   },
   bodyPart: {
     back: 'Schiena',

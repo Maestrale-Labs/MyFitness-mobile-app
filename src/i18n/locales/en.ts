@@ -25,9 +25,7 @@ export const en: Translations = {
     targetMuscle: 'Primary muscle',
     secondaryMuscles: 'Secondary muscles',
     equipment: 'Equipment',
-    bodyPart: 'Body part',
-    animationNew: 'New (prototype)',
-    animationOriginal: 'Original',
+    muscleGroup: 'Muscle group',
     details: 'Details',
     howTo: 'How to do it',
     mediaCredit: 'Animation © {{credit}}',
@@ -62,6 +60,13 @@ export const en: Translations = {
   legal: {
     draftNotice: 'Draft text: the final version will be published before release.',
     lastUpdated: 'Last updated: {{date}}',
+  },
+  muscleGroup: {
+    back: 'Back',
+    legs: 'Legs',
+    glutes: 'Glutes',
+    biceps: 'Biceps',
+    chest: 'Chest',
   },
   bodyPart: {
     back: 'Back',

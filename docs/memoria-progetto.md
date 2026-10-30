@@ -10,7 +10,7 @@ Ultimo aggiornamento: 30 ottobre 2026.
 - Valerio ha visto il primo risultato e la UI non lo convinceva, a partire dalla barra di navigazione in basso. **La UI è stata rifatta con lo stile di Paniere** (30 ottobre 2026): barra a pillola flottante, card bianche, righe in stile impostazioni, icone Hugeicons. Va ancora vista da Valerio su un telefono.
 - Paniere non era raggiungibile dalla sessione cloud in cui è nata l'app (vedi «Paniere» più sotto). Ora è in locale in `../paniere-mobile-app`.
 - L'app è collegata al progetto Expo `@maestrale-lab/fitness` e ha il suo `eas.json` (vedi «Expo, EAS e App Store»).
-- La tabella Supabase degli esercizi è pronta come migrazione in `supabase/migrations/` (con i 2 esercizi di prova) ed è stata provata su un Postgres locale. **Non è ancora applicata al progetto**, e l'app legge ancora gli esercizi dal codice.
+- La tabella Supabase degli esercizi è pronta come migrazione in `supabase/migrations/` (con i 2 esercizi di prova) ed è stata provata su un Postgres locale. **Non è ancora applicata al progetto**, e l'app legge ancora gli esercizi dal codice. Ora nel codice gli esercizi sono 30 e c'è il campo nuovo `muscleGroup`: prima di applicare le migrazioni vanno aggiornate tutte e due le cose.
 - Il repository GitHub è stato rinominato da `Maestrale-Labs/Fitness` a `Maestrale-Labs/MyFitness-mobile-app`.
 
 **Prossimi passi** (si parte da quello che si sblocca prima):
@@ -100,8 +100,9 @@ Deciso con Valerio il 30 ottobre 2026:
 
 - Fonte scelta: [hasaneyldrm/exercises-dataset](https://github.com/hasaneyldrm/exercises-dataset), con 1.324 esercizi, GIF, istruzioni in 10 lingue (italiano compreso) e licenza MIT per dati e testi.
 - **Attenzione: le GIF sono © Gym visual** e non sono coperte dalla licenza MIT. Prima di pubblicare serve una licenza da Gym visual, oppure un'alternativa come [yuhonas/free-exercise-db](https://github.com/yuhonas/free-exercise-db) (pubblico dominio, foto fisse). Per questo le GIF non sono copiate nel repository, che è pubblico: l'app le carica dal repo originale fissato a un commit, e sotto ogni animazione mostra «© Gym visual».
-- Le traduzioni italiane del dataset sono automatiche e contengono errori. Quelle dei 2 esercizi di prova sono state corrette a mano.
-- Gli esercizi caricati sono 2: lat machine (`0150`) e panca piana con bilanciere (`0025`).
+- Le traduzioni italiane del dataset sono automatiche e contengono errori. Per gli esercizi caricati i nomi e i passaggi in italiano sono scritti a mano.
+- **Esercizi caricati (30 ottobre 2026): 30**, 5 o 6 per gruppo muscolare, scelti tra i più comuni in palestra. I gruppi sono Schiena, Gambe, Glutei, Bicipiti e Petto, e sono quelli dei filtri nella lista. Il gruppo (`muscleGroup`) lo decidiamo noi per ogni esercizio; il muscolo «target» del dataset a volte è diverso (per esempio lo squat lì risulta per i glutei, e l'abbiamo messo nelle gambe con i quadricipiti come muscolo principale).
+- Nel dataset ci sono anche errori di contenuto: nel curl a martello i palmi ruotavano in avanti, e nel kickback ai cavi la posizione era girata rispetto all'immagine. Sono stati corretti in tutte e due le lingue.
 - I dettagli sono in `docs/exercise-data.md`.
 
 ### Profilo
@@ -149,7 +150,7 @@ Deciso con Valerio il 30 ottobre 2026:
 ## Domande ancora aperte
 
 - **Nome dell'app:** per ora resta «Fitness» (decisione di Valerio). Si rivede prima di andare live e di creare l'app su App Store Connect, anche perché «Fitness» è il nome dell'app di Apple. Se cambia, basta toccare `name` in `app.json`; slug, bundle ID e progetto Expo sono identificativi interni e possono restare. Icona e splash sono ancora quelli del template Expo.
-- **Animazioni:** licenza Gym visual, oppure animazioni nostre? Le GIF del dataset vanno a scatti già all'origine (il lat pulldown ha 12 fotogrammi a 180×180 px, con pause di 1 s). Ricalcarle o interpolarle senza licenza non si può. Il 30 ottobre 2026 c'è un **prototipo nostro** per il lat pulldown: una figura SVG vista di fronte, animata con Reanimated a 60 fps (`src/features/exercises/animations/`). Nel dettaglio c'è l'interruttore «Nuova / Originale» per confrontarle. Valerio deve vederlo sull'iPhone e decidere se proseguire su questa strada.
+- **Animazioni:** per ora si tengono le **GIF originali** del dataset. Vanno a scatti già all'origine (il lat pulldown ha 12 fotogrammi a 180×180 px, con pause di 1 s), e ricalcarle o interpolarle senza licenza non si può. Il 30 ottobre 2026 è stato provato un prototipo nostro (una figura SVG animata in codice), ma a Valerio non è piaciuto («terribile») ed è stato tolto. Resta aperta la licenza Gym visual prima del rilascio.
 - **Testi legali** definitivi e URL della privacy policy.
 - **Progetto Supabase:** creato, con le migrazioni del catalogo pronte; ancora da collegare alla CLI, applicare e usare nell'app (vedi «Supabase»).
 - **Struttura delle schede:** confermare la proposta della tabella unica per schede nostre e personali (vedi «Account e uso senza registrazione»).
@@ -179,6 +180,7 @@ Deciso con Valerio il 30 ottobre 2026:
 
 6. **Expo.** Valerio fa il login con Supabase e aggiunge la repo di Paniere in locale (`../paniere-mobile-app`). Si crea il progetto Expo `@maestrale-lab/fitness` e si aggiunge `eas.json`; App Store Connect si rimanda alla prima pubblicazione.
 7. **UI come Paniere.** Si studia Paniere (vedi «Lo stile di Paniere») e si rifà la UI di Fitness: barra a pillola flottante con tab JavaScript, niente header nativi, card bianche, righe in stile impostazioni, icone Hugeicons, neutri freddi con l'arancione come unico colore del brand. Provata nell'anteprima web, in chiaro e in scuro.
+8. **Animazioni e più esercizi.** Le GIF del dataset vanno a scatti. Un prototipo di animazione nostra viene scartato da Valerio, quindi si tengono le GIF originali. Si caricano 30 esercizi, 5 o 6 per gruppo (schiena, gambe, glutei, bicipiti, petto), con i nomi e i testi italiani scritti a mano, e la lista si filtra per gruppo muscolare.
 
 ### Richiesta iniziale (testo integrale)
 

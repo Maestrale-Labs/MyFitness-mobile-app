@@ -4,7 +4,7 @@ App di allenamento per iOS (prima) e Android, fatta con **Expo** (React Native).
 
 Per ora ci sono due sezioni:
 
-- **Esercizi**: lista con ricerca e filtro per zona del corpo; il dettaglio mostra l'animazione, i muscoli coinvolti e i passaggi dell'esecuzione. Al momento ci sono 2 esercizi di prova (lat machine e panca piana).
+- **Esercizi**: lista con ricerca e filtro per gruppo muscolare (schiena, gambe, glutei, bicipiti, petto); il dettaglio mostra l'animazione, i muscoli coinvolti e i passaggi dell'esecuzione. Al momento ci sono 30 esercizi, 5 o 6 per gruppo.
 - **Profilo**: nome, tema (automatico / chiaro / scuro), lingua (automatica / italiano / inglese), termini e condizioni, privacy policy, versione.
 
 Decisioni, stato del lavoro e prossimi passi sono in [docs/memoria-progetto.md](docs/memoria-progetto.md).

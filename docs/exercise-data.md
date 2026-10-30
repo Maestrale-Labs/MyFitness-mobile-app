@@ -8,7 +8,7 @@
 - istruzioni passo per passo in 10 lingue, **italiano compreso**;
 - un'animazione GIF e un'immagine fissa, entrambe 180×180 px.
 
-Per ora nell'app ce ne sono 2 (`src/features/exercises/data/seed.ts`): la lat machine (`0150`, *cable bar lateral pulldown*) e la panca piana con bilanciere (`0025`).
+Per ora nell'app ce ne sono 30 (`src/features/exercises/data/seed.ts`), 5 o 6 per gruppo muscolare (schiena, gambe, glutei, bicipiti, petto), scelti tra i più comuni in palestra. Il gruppo (`muscleGroup`) lo assegniamo noi; ogni esercizio tiene in `source.id` l'id del dataset.
 
 ### Licenza: attenzione alle animazioni
 
@@ -31,7 +31,7 @@ Il codice non cambia: ogni esercizio ha già i campi `media.gif`, `media.thumbna
 
 ### Traduzioni italiane
 
-Le istruzioni italiane del dataset sono traduzioni automatiche, con errori (ad esempio *elbows tucked in* diventa «gomiti piegati» invece di «gomiti vicini al corpo») e forme miste («Sdraiati» / «Afferrare»). Quelle dei 2 esercizi di prova sono state riviste a mano; con l'import completo andranno riviste, almeno per gli esercizi più usati.
+Le istruzioni italiane del dataset sono traduzioni automatiche, con errori (ad esempio *elbows tucked in* diventa «gomiti piegati» invece di «gomiti vicini al corpo») e forme miste («Sdraiati» / «Afferrare»). Quelle degli esercizi caricati sono state riscritte a mano (insieme ai nomi italiani); con l'import completo andranno riviste, almeno per gli esercizi più usati.
 
 Anche i nomi sono solo in inglese: quelli italiani (per esempio «Lat machine») vanno scritti da noi.
 
@@ -41,6 +41,7 @@ Anche i nomi sono solo in inglese: quelli italiani (per esempio «Lat machine»)
 type Exercise = {
   id: string; // slug per gli URL, es. "lat-pulldown"
   name: { it: string; en: string };
+  muscleGroup: MuscleGroup; // gruppo per i filtri, es. "back": lo scegliamo noi
   bodyPart: BodyPart; // es. "back"
   equipment: Equipment; // es. "cable"
   targetMuscle: Muscle; // es. "lats"

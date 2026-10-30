@@ -1,11 +1,9 @@
 import { Image } from 'expo-image';
 import { useLocalSearchParams } from 'expo-router';
-import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ActivityIndicator, ScrollView, StyleSheet, Text, View } from 'react-native';
 
 import { Card } from '@/components/card';
-import { Chip } from '@/components/chip';
 import { Icon } from '@/components/icon';
 import { Screen } from '@/components/screen';
 import { SectionLabel } from '@/components/section-label';
@@ -13,13 +11,10 @@ import { SubScreenHeader } from '@/components/sub-screen-header';
 import { ThemedText } from '@/components/themed-text';
 import { icons } from '@/constants/icons';
 import { Spacing } from '@/constants/theme';
-import { exerciseAnimations } from '@/features/exercises/animations';
 import { useExercise } from '@/features/exercises/queries';
 import { makeStyles } from '@/hooks/use-styles';
 import { useTheme } from '@/hooks/use-theme';
 import { useLocale } from '@/i18n';
-
-const MEDIA_SIZE = 260;
 
 export default function ExerciseDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -28,7 +23,6 @@ export default function ExerciseDetailScreen() {
   const theme = useTheme();
   const locale = useLocale();
   const { t } = useTranslation();
-  const [showOriginal, setShowOriginal] = useState(false);
 
   if (isPending || !exercise) {
     return (
@@ -62,68 +56,38 @@ export default function ExerciseDetailScreen() {
       value: t(`equipment.${exercise.equipment}`),
     },
     {
-      icon: icons.bodyPart,
-      label: t('exerciseDetail.bodyPart'),
-      value: t(`bodyPart.${exercise.bodyPart}`),
+      icon: icons.muscleGroup,
+      label: t('exerciseDetail.muscleGroup'),
+      value: t(`muscleGroup.${exercise.muscleGroup}`),
     },
   ];
   const steps = exercise.steps[locale];
-  const OwnAnimation = exerciseAnimations[exercise.id];
-  const showsGif = !OwnAnimation || showOriginal;
 
   return (
     <Screen withBottomInset>
       <SubScreenHeader />
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.content}>
-        {showsGif ? (
-          // The GIF has a white background, so it sits on white in dark mode too.
-          <Card style={styles.gifCard}>
-            <View style={[styles.mediaFrame, styles.gifFrame]}>
-              <Image
-                source={exercise.media.gif}
-                placeholder={exercise.media.thumbnail}
-                style={styles.media}
-                contentFit="contain"
-                autoplay
-                accessibilityLabel={exercise.name[locale]}
-                accessibilityIgnoresInvertColors
-              />
-            </View>
-          </Card>
-        ) : (
-          <Card>
-            <View
-              style={styles.mediaFrame}
-              accessible
-              accessibilityRole="image"
-              accessibilityLabel={exercise.name[locale]}>
-              <OwnAnimation size={MEDIA_SIZE} />
-            </View>
-          </Card>
-        )}
-
-        {/* Prototype: compare our animation with the dataset's. */}
-        {OwnAnimation ? (
-          <View style={styles.mediaSwitch}>
-            <Chip
-              label={t('exerciseDetail.animationNew')}
-              selected={!showOriginal}
-              onPress={() => setShowOriginal(false)}
-            />
-            <Chip
-              label={t('exerciseDetail.animationOriginal')}
-              selected={showOriginal}
-              onPress={() => setShowOriginal(true)}
+        {/* The animation has a white background, so it sits on white in dark mode too. */}
+        <Card style={styles.mediaCard}>
+          <View style={styles.mediaFrame}>
+            <Image
+              source={exercise.media.gif}
+              placeholder={exercise.media.thumbnail}
+              style={styles.media}
+              contentFit="contain"
+              autoplay
+              accessibilityLabel={exercise.name[locale]}
+              accessibilityIgnoresInvertColors
             />
           </View>
-        ) : null}
+        </Card>
 
         <View style={styles.heading}>
           <ThemedText type="title" accessibilityRole="header">
             {exercise.name[locale]}
           </ThemedText>
           <ThemedText type="subhead" themeColor="textSecondary">
-            {t(`bodyPart.${exercise.bodyPart}`)} · {t(`equipment.${exercise.equipment}`)}
+            {t(`muscleGroup.${exercise.muscleGroup}`)} · {t(`equipment.${exercise.equipment}`)}
           </ThemedText>
         </View>
 
@@ -154,11 +118,9 @@ export default function ExerciseDetailScreen() {
           ))}
         </Card>
 
-        {showsGif ? (
-          <ThemedText type="footnote" themeColor="textSecondary" style={styles.credit}>
-            {t('exerciseDetail.mediaCredit', { credit: exercise.media.credit })}
-          </ThemedText>
-        ) : null}
+        <ThemedText type="footnote" themeColor="textSecondary" style={styles.credit}>
+          {t('exerciseDetail.mediaCredit', { credit: exercise.media.credit })}
+        </ThemedText>
       </ScrollView>
     </Screen>
   );
@@ -177,26 +139,18 @@ const useStyles = makeStyles((theme) => ({
     paddingTop: Spacing.two,
     paddingBottom: Spacing.six,
   },
-  gifCard: {
+  mediaCard: {
     backgroundColor: '#FFFFFF',
   },
   mediaFrame: {
     alignItems: 'center',
-    paddingVertical: Spacing.four,
-  },
-  gifFrame: {
     backgroundColor: '#FFFFFF',
+    paddingVertical: Spacing.four,
   },
   // The source animations are 180×180 px; larger sizes get blurry.
   media: {
-    width: MEDIA_SIZE,
-    height: MEDIA_SIZE,
-  },
-  mediaSwitch: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    gap: Spacing.two,
-    marginTop: -Spacing.one,
+    width: 260,
+    height: 260,
   },
   heading: {
     gap: Spacing.one,
