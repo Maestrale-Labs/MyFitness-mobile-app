@@ -8,7 +8,16 @@ export type Muscle = keyof Translations['muscle'];
 export type MuscleGroup = keyof Translations['muscleGroup'];
 
 /** The muscle groups the exercise list is filtered by, in display order. */
-export const muscleGroups: MuscleGroup[] = ['back', 'legs', 'glutes', 'biceps', 'chest'];
+export const muscleGroups: MuscleGroup[] = [
+  'back',
+  'legs',
+  'glutes',
+  'biceps',
+  'chest',
+  'shoulders',
+  'triceps',
+  'abs',
+];
 
 export type Exercise = {
   /** Stable slug, used in URLs. */

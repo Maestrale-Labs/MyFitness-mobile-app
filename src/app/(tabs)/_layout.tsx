@@ -38,6 +38,10 @@ export default function TabLayout() {
         options={{ title: t('tabs.exercises'), tabBarIcon: tabIcon(icons.tabExercises) }}
       />
       <Tabs.Screen
+        name="workouts"
+        options={{ title: t('tabs.workouts'), tabBarIcon: tabIcon(icons.tabWorkouts) }}
+      />
+      <Tabs.Screen
         name="profile"
         options={{ title: t('tabs.profile'), tabBarIcon: tabIcon(icons.tabProfile) }}
       />

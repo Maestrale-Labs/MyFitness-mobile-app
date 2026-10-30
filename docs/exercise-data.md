@@ -8,7 +8,7 @@
 - istruzioni passo per passo in 10 lingue, **italiano compreso**;
 - un'animazione GIF e un'immagine fissa, entrambe 180×180 px.
 
-Per ora nell'app ce ne sono 30 (`src/features/exercises/data/seed.ts`), 5 o 6 per gruppo muscolare (schiena, gambe, glutei, bicipiti, petto), scelti tra i più comuni in palestra. Il gruppo (`muscleGroup`) lo assegniamo noi; ogni esercizio tiene in `source.id` l'id del dataset.
+Per ora nell'app ce ne sono 36 (`src/features/exercises/data/seed.ts`): 5 o 6 per gruppo muscolare (schiena, gambe, glutei, bicipiti, petto), scelti tra i più comuni in palestra, più i 6 che servono alle schede di allenamento (spalle, tricipiti, polpacci, addome). Il gruppo (`muscleGroup`) lo assegniamo noi; ogni esercizio tiene in `source.id` l'id del dataset.
 
 ### Licenza: attenzione alle animazioni
 

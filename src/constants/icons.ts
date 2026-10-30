@@ -5,13 +5,17 @@ import {
   ArrowLeft01Icon,
   ArrowRight01Icon,
   BodyPartMuscleIcon,
+  Calendar03Icon,
   CancelCircleIcon,
   CheckmarkCircle02Icon,
   CircleIcon,
+  Clock01Icon,
   Dumbbell01Icon,
   File01Icon,
   Globe02Icon,
+  Idea01Icon,
   InformationCircleIcon,
+  Layers01Icon,
   Moon02Icon,
   PencilEdit02Icon,
   Search01Icon,
@@ -19,6 +23,7 @@ import {
   SmartPhone01Icon,
   Sun03Icon,
   Target02Icon,
+  TaskDaily01Icon,
   UserIcon,
   WorkoutRunIcon,
 } from '@hugeicons/core-free-icons';
@@ -26,6 +31,7 @@ import {
 export const icons = {
   // tab bar
   tabExercises: Dumbbell01Icon,
+  tabWorkouts: TaskDaily01Icon,
   tabProfile: UserIcon,
   // navigation
   back: ArrowLeft01Icon,
@@ -41,6 +47,12 @@ export const icons = {
   equipment: Dumbbell01Icon,
   targetMuscle: Target02Icon,
   secondaryMuscles: BodyPartMuscleIcon,
+  // workout plans
+  plan: TaskDaily01Icon,
+  daysPerWeek: Calendar03Icon,
+  duration: Clock01Icon,
+  workouts: Layers01Icon,
+  tips: Idea01Icon,
   // profile
   user: UserIcon,
   name: PencilEdit02Icon,

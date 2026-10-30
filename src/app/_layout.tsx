@@ -61,6 +61,7 @@ export default function RootLayout() {
           }}>
           <Stack.Screen name="(tabs)" />
           <Stack.Screen name="exercises/[id]" />
+          <Stack.Screen name="workouts/[id]" />
           <Stack.Screen name="profile/name" />
           <Stack.Screen name="profile/theme" />
           <Stack.Screen name="profile/language" />

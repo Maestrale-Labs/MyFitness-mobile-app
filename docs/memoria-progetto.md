@@ -7,15 +7,16 @@ Ultimo aggiornamento: 30 ottobre 2026.
 ## Dove siamo arrivati
 
 - La base dell'app c'è: tab **Esercizi** (lista, ricerca, filtro, dettaglio con GIF) e tab **Profilo** (nome, tema, lingua, termini, privacy, versione). Il primo commit è `986624b` sul branch `claude/tender-archimedes-lr4kab`.
+- C'è una terza tab, **Allenamenti** («I miei allenamenti»), con le prime 2 schede preimpostate per principianti (vedi «Schede di allenamento»). Per ora si consultano e basta: non si salva ancora nulla.
 - Valerio ha visto il primo risultato e la UI non lo convinceva, a partire dalla barra di navigazione in basso. **La UI è stata rifatta con lo stile di Paniere** (30 ottobre 2026): barra a pillola flottante, card bianche, righe in stile impostazioni, icone Hugeicons. Va ancora vista da Valerio su un telefono.
 - Paniere non era raggiungibile dalla sessione cloud in cui è nata l'app (vedi «Paniere» più sotto). Ora è in locale in `../paniere-mobile-app`.
 - L'app è collegata al progetto Expo `@maestrale-lab/fitness` e ha il suo `eas.json` (vedi «Expo, EAS e App Store»).
-- La tabella Supabase degli esercizi è pronta come migrazione in `supabase/migrations/` (con i 2 esercizi di prova) ed è stata provata su un Postgres locale. **Non è ancora applicata al progetto**, e l'app legge ancora gli esercizi dal codice. Ora nel codice gli esercizi sono 30 e c'è il campo nuovo `muscleGroup`: prima di applicare le migrazioni vanno aggiornate tutte e due le cose.
+- La tabella Supabase degli esercizi è pronta come migrazione in `supabase/migrations/` (con i 2 esercizi di prova) ed è stata provata su un Postgres locale. **Non è ancora applicata al progetto**, e l'app legge ancora gli esercizi dal codice. Ora nel codice gli esercizi sono 36 e c'è il campo nuovo `muscleGroup`: prima di applicare le migrazioni vanno aggiornate tutte e due le cose.
 - Il repository GitHub è stato rinominato da `Maestrale-Labs/Fitness` a `Maestrale-Labs/MyFitness-mobile-app`.
 
 **Prossimi passi** (si parte da quello che si sblocca prima):
 
-- far vedere a Valerio la nuova UI sul telefono (Expo Go) e correggere quello che non va;
+- far vedere a Valerio le schede sul telefono (Expo Go) e correggere quello che non va;
 - applicare le migrazioni a Supabase e far leggere gli esercizi all'app da lì.
 
 I dettagli sono in «Cosa fare adesso».
@@ -101,9 +102,22 @@ Deciso con Valerio il 30 ottobre 2026:
 - Fonte scelta: [hasaneyldrm/exercises-dataset](https://github.com/hasaneyldrm/exercises-dataset), con 1.324 esercizi, GIF, istruzioni in 10 lingue (italiano compreso) e licenza MIT per dati e testi.
 - **Attenzione: le GIF sono © Gym visual** e non sono coperte dalla licenza MIT. Prima di pubblicare serve una licenza da Gym visual, oppure un'alternativa come [yuhonas/free-exercise-db](https://github.com/yuhonas/free-exercise-db) (pubblico dominio, foto fisse). Per questo le GIF non sono copiate nel repository, che è pubblico: l'app le carica dal repo originale fissato a un commit, e sotto ogni animazione mostra «© Gym visual».
 - Le traduzioni italiane del dataset sono automatiche e contengono errori. Per gli esercizi caricati i nomi e i passaggi in italiano sono scritti a mano.
-- **Esercizi caricati (30 ottobre 2026): 30**, 5 o 6 per gruppo muscolare, scelti tra i più comuni in palestra. I gruppi sono Schiena, Gambe, Glutei, Bicipiti e Petto, e sono quelli dei filtri nella lista. Il gruppo (`muscleGroup`) lo decidiamo noi per ogni esercizio; il muscolo «target» del dataset a volte è diverso (per esempio lo squat lì risulta per i glutei, e l'abbiamo messo nelle gambe con i quadricipiti come muscolo principale).
+- **Esercizi caricati (30 ottobre 2026): 36.** Ci sono 5 o 6 esercizi per gruppo muscolare (Schiena, Gambe, Glutei, Bicipiti, Petto), scelti tra i più comuni in palestra. Poi ci sono i 6 che servivano alle schede: lento avanti e alzate laterali con manubri (Spalle), push-down ai cavi e French press con manubrio (Tricipiti), calf raise in piedi alla macchina (Gambe) e crunch a terra (Addome). I gruppi sono anche i filtri della lista. Nel dataset non c'è un plank semplice, quindi per l'addome per ora c'è solo il crunch. Il gruppo (`muscleGroup`) lo decidiamo noi per ogni esercizio; il muscolo «target» del dataset a volte è diverso (per esempio lo squat lì risulta per i glutei, e l'abbiamo messo nelle gambe con i quadricipiti come muscolo principale).
 - Nel dataset ci sono anche errori di contenuto: nel curl a martello i palmi ruotavano in avanti, e nel kickback ai cavi la posizione era girata rispetto all'immagine. Sono stati corretti in tutte e due le lingue.
 - I dettagli sono in `docs/exercise-data.md`.
+
+### Schede di allenamento
+
+Decise il 30 ottobre 2026:
+
+- **Dove stanno:** nella tab **Allenamenti** (in mezzo, tra Esercizi e Profilo), con il titolo «I miei allenamenti». In alto ci sono le «Schede consigliate», cioè quelle fornite da noi; sotto c'è «Le tue schede», per ora solo un messaggio che annuncia le schede personalizzate.
+- **Le prime 2 schede,** tutte e due con obiettivo **aumento muscolare** e livello **principiante**, di 8 settimane:
+  - **Full body principiante:** 3 giorni a settimana, alternando l'allenamento A e il B. Pochi esercizi, soprattutto macchine e manubri.
+  - **Upper/Lower principiante:** 4 giorni a settimana (Upper A, Lower A, Upper B, Lower B). È il passo successivo dopo qualche mese di full body.
+- **Cosa c'è in una scheda:** descrizione, giorni a settimana, durata, come organizzare la settimana, gli allenamenti (con serie, ripetizioni e recupero di ogni esercizio) e alcuni consigli generali (riscaldamento, scelta del peso, progressione). Dalla scheda si apre il dettaglio di ogni esercizio.
+- **Codice:** `src/features/workouts/` ha i tipi (`WorkoutPlan`, `Workout`, `PlanExercise`), i dati in `data/plans.ts` e un `WorkoutPlanRepository` letto con React Query, come per gli esercizi, così anche le schede potranno passare a Supabase. Le schermate sono `src/app/(tabs)/workouts.tsx` e `src/app/workouts/[id].tsx`. Una scheda fa riferimento agli esercizi tramite il loro `id`.
+- **Esercizi aggiunti per le schede:** 6 (vedi «Il dataset degli esercizi»), con 3 gruppi muscolari nuovi: Spalle, Tricipiti e Addome.
+- **Non c'è ancora:** salvare una scheda, segnare le serie fatte e i pesi, lo storico. Arrivano con il diario.
 
 ### Profilo
 
@@ -141,7 +155,7 @@ Deciso con Valerio il 30 ottobre 2026:
    - aggiungere un `ExerciseRepository` che legge da Supabase (con `@supabase/supabase-js` e le variabili di `.env`) e usarlo al posto di quello locale;
    - verificare sul telefono.
 5. Poi, nell'ordine:
-   - schede preimpostate, senza account;
+   - ~~schede preimpostate, senza account~~ (le prime 2 ci sono dal 30 ottobre 2026, da vedere sul telefono);
    - account;
    - schede personalizzate e aggiunta di esercizi a una scheda;
    - diario giornaliero, pesi, recuperi e record;
@@ -181,6 +195,7 @@ Deciso con Valerio il 30 ottobre 2026:
 6. **Expo.** Valerio fa il login con Supabase e aggiunge la repo di Paniere in locale (`../paniere-mobile-app`). Si crea il progetto Expo `@maestrale-lab/fitness` e si aggiunge `eas.json`; App Store Connect si rimanda alla prima pubblicazione.
 7. **UI come Paniere.** Si studia Paniere (vedi «Lo stile di Paniere») e si rifà la UI di Fitness: barra a pillola flottante con tab JavaScript, niente header nativi, card bianche, righe in stile impostazioni, icone Hugeicons, neutri freddi con l'arancione come unico colore del brand. Provata nell'anteprima web, in chiaro e in scuro.
 8. **Animazioni e più esercizi.** Le GIF del dataset vanno a scatti. Un prototipo di animazione nostra viene scartato da Valerio, quindi si tengono le GIF originali. Si caricano 30 esercizi, 5 o 6 per gruppo (schiena, gambe, glutei, bicipiti, petto), con i nomi e i testi italiani scritti a mano, e la lista si filtra per gruppo muscolare.
+9. **Schede.** Valerio chiede le prime schede, per l'aumento muscolare e di livello principiante, in una nuova sezione della navigazione («My Workout, qualcosa di questo genere»). Si aggiunge la tab **Allenamenti** con 2 schede, Full body (3 giorni) e Upper/Lower (4 giorni). Si caricano i 6 esercizi che mancavano, per un totale di 36.
 
 ### Richiesta iniziale (testo integrale)
 
