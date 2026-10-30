@@ -16,10 +16,8 @@ export type PlanExercise = {
   restSeconds: number;
 };
 
-/** One training day of a plan, such as "Workout A". */
-export type Workout = {
-  id: string;
-  name: Localized;
+/** One training day of a plan. Days are numbered by position; two days can be the same. */
+export type WorkoutDay = {
   /** The muscles it works, in a few words. */
   focus: Localized;
   exercises: PlanExercise[];
@@ -34,8 +32,9 @@ export type WorkoutPlan = {
   level: PlanLevel;
   daysPerWeek: number;
   durationWeeks: number;
-  /** How to spread the workouts over the week. */
+  /** How to spread the days over the week. */
   schedule: Localized;
-  workouts: Workout[];
+  /** One entry per training day of the week, in order: day 1, day 2… */
+  days: WorkoutDay[];
   tips: Localized<string[]>;
 };

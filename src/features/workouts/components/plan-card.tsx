@@ -47,8 +47,8 @@ export function PlanCard({ plan }: { plan: WorkoutPlan }) {
                   label={t('plan.daysPerWeek', { count: plan.daysPerWeek })}
                 />
                 <Fact
-                  icon={icons.workouts}
-                  label={t('plan.workoutCount', { count: plan.workouts.length })}
+                  icon={icons.duration}
+                  label={t('plan.weeks', { count: plan.durationWeeks })}
                 />
               </View>
             </View>

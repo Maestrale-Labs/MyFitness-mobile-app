@@ -35,11 +35,11 @@ export default function TabLayout() {
       }}>
       <Tabs.Screen
         name="index"
-        options={{ title: t('tabs.exercises'), tabBarIcon: tabIcon(icons.tabExercises) }}
+        options={{ title: t('tabs.workouts'), tabBarIcon: tabIcon(icons.tabWorkouts) }}
       />
       <Tabs.Screen
-        name="workouts"
-        options={{ title: t('tabs.workouts'), tabBarIcon: tabIcon(icons.tabWorkouts) }}
+        name="exercises"
+        options={{ title: t('tabs.exercises'), tabBarIcon: tabIcon(icons.tabExercises) }}
       />
       <Tabs.Screen
         name="profile"

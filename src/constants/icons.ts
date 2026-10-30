@@ -15,7 +15,6 @@ import {
   Globe02Icon,
   Idea01Icon,
   InformationCircleIcon,
-  Layers01Icon,
   Moon02Icon,
   PencilEdit02Icon,
   Search01Icon,
@@ -51,7 +50,6 @@ export const icons = {
   plan: TaskDaily01Icon,
   daysPerWeek: Calendar03Icon,
   duration: Clock01Icon,
-  workouts: Layers01Icon,
   tips: Idea01Icon,
   // profile
   user: UserIcon,

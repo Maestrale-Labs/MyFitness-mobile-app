@@ -1,6 +1,6 @@
 import type { Localized } from '@/i18n';
 
-import type { PlanExercise, WorkoutPlan } from '../types';
+import type { PlanExercise, WorkoutDay, WorkoutPlan } from '../types';
 
 /** Shorthand for a prescription: sets × min–max reps, rest in seconds. */
 function ex(
@@ -30,6 +30,32 @@ const beginnerTips: Localized<string[]> = {
   ],
 };
 
+// The full body plan repeats its first day on day 3.
+const fullBodyA: WorkoutDay = {
+  focus: { it: 'Gambe, petto, schiena, spalle', en: 'Legs, chest, back, shoulders' },
+  exercises: [
+    ex('leg-press', 3, [10, 12], 120),
+    ex('dumbbell-bench-press', 3, [8, 12], 90),
+    ex('lat-pulldown', 3, [10, 12], 90),
+    ex('dumbbell-shoulder-press', 3, [10, 12], 90),
+    ex('seated-leg-curl', 3, [12, 15], 60),
+    ex('crunch', 3, [12, 15], 60),
+  ],
+};
+
+const fullBodyB: WorkoutDay = {
+  focus: { it: 'Gambe, schiena, petto, braccia', en: 'Legs, back, chest, arms' },
+  exercises: [
+    ex('goblet-squat', 3, [10, 12], 90),
+    ex('cable-seated-row', 3, [10, 12], 90),
+    ex('machine-chest-press', 3, [10, 12], 90),
+    ex('romanian-deadlift', 3, [10, 12], 120),
+    ex('dumbbell-lateral-raise', 3, [12, 15], 60),
+    ex('dumbbell-curl', 2, [10, 12], 60),
+    ex('rope-triceps-pushdown', 2, [10, 12], 60),
+  ],
+};
+
 /**
  * Plans we provide. Every `exerciseId` must exist in the exercise catalog: the plan
  * screens show an exercise only once the repository returns it.
@@ -39,46 +65,18 @@ export const seedPlans: WorkoutPlan[] = [
     id: 'full-body-beginner',
     name: { it: 'Full body principiante', en: 'Beginner full body' },
     summary: {
-      it: 'Tre allenamenti a settimana per tutto il corpo, alternando A e B. Pensata per chi inizia: pochi esercizi, soprattutto macchine e manubri.',
-      en: 'Three full-body workouts a week, alternating A and B. Built for beginners: few exercises, mostly machines and dumbbells.',
+      it: 'Tre allenamenti a settimana per tutto il corpo. Pensata per chi inizia: pochi esercizi, soprattutto macchine e manubri.',
+      en: 'Three full-body workouts a week. Built for beginners: few exercises, mostly machines and dumbbells.',
     },
     goal: 'muscleGain',
     level: 'beginner',
     daysPerWeek: 3,
     durationWeeks: 8,
     schedule: {
-      it: 'Tre giorni non consecutivi, per esempio lunedì, mercoledì e venerdì. Alterna A e B: una settimana A, B, A e la successiva B, A, B.',
-      en: 'Three non-consecutive days, for example Monday, Wednesday and Friday. Alternate A and B: one week A, B, A and the next B, A, B.',
+      it: 'Tre giorni non consecutivi, per esempio lunedì (giorno 1), mercoledì (giorno 2) e venerdì (giorno 3). Il giorno 3 è uguale al giorno 1.',
+      en: 'Three non-consecutive days, for example Monday (day 1), Wednesday (day 2) and Friday (day 3). Day 3 is the same as day 1.',
     },
-    workouts: [
-      {
-        id: 'a',
-        name: { it: 'Allenamento A', en: 'Workout A' },
-        focus: { it: 'Gambe, petto, schiena, spalle', en: 'Legs, chest, back, shoulders' },
-        exercises: [
-          ex('leg-press', 3, [10, 12], 120),
-          ex('dumbbell-bench-press', 3, [8, 12], 90),
-          ex('lat-pulldown', 3, [10, 12], 90),
-          ex('dumbbell-shoulder-press', 3, [10, 12], 90),
-          ex('seated-leg-curl', 3, [12, 15], 60),
-          ex('crunch', 3, [12, 15], 60),
-        ],
-      },
-      {
-        id: 'b',
-        name: { it: 'Allenamento B', en: 'Workout B' },
-        focus: { it: 'Gambe, schiena, petto, braccia', en: 'Legs, back, chest, arms' },
-        exercises: [
-          ex('goblet-squat', 3, [10, 12], 90),
-          ex('cable-seated-row', 3, [10, 12], 90),
-          ex('machine-chest-press', 3, [10, 12], 90),
-          ex('romanian-deadlift', 3, [10, 12], 120),
-          ex('dumbbell-lateral-raise', 3, [12, 15], 60),
-          ex('dumbbell-curl', 2, [10, 12], 60),
-          ex('rope-triceps-pushdown', 2, [10, 12], 60),
-        ],
-      },
-    ],
+    days: [fullBodyA, fullBodyB, fullBodyA],
     tips: beginnerTips,
   },
   {
@@ -93,14 +91,15 @@ export const seedPlans: WorkoutPlan[] = [
     daysPerWeek: 4,
     durationWeeks: 8,
     schedule: {
-      it: 'Per esempio: lunedì Upper A, martedì Lower A, giovedì Upper B, venerdì Lower B. Mercoledì e il fine settimana sono di riposo.',
-      en: 'For example: Monday Upper A, Tuesday Lower A, Thursday Upper B, Friday Lower B. Wednesday and the weekend are rest days.',
+      it: 'Per esempio lunedì (giorno 1), martedì (giorno 2), giovedì (giorno 3) e venerdì (giorno 4). Mercoledì e il fine settimana sono di riposo.',
+      en: 'For example Monday (day 1), Tuesday (day 2), Thursday (day 3) and Friday (day 4). Wednesday and the weekend are rest days.',
     },
-    workouts: [
+    days: [
       {
-        id: 'upper-a',
-        name: { it: 'Upper A', en: 'Upper A' },
-        focus: { it: 'Petto, schiena, spalle, braccia', en: 'Chest, back, shoulders, arms' },
+        focus: {
+          it: 'Parte alta: petto, schiena, spalle, braccia',
+          en: 'Upper body: chest, back, shoulders, arms',
+        },
         exercises: [
           ex('barbell-bench-press', 3, [8, 10], 120),
           ex('lat-pulldown', 3, [10, 12], 90),
@@ -111,9 +110,10 @@ export const seedPlans: WorkoutPlan[] = [
         ],
       },
       {
-        id: 'lower-a',
-        name: { it: 'Lower A', en: 'Lower A' },
-        focus: { it: 'Quadricipiti, femorali, polpacci', en: 'Quads, hamstrings, calves' },
+        focus: {
+          it: 'Parte bassa: quadricipiti, femorali, polpacci',
+          en: 'Lower body: quads, hamstrings, calves',
+        },
         exercises: [
           ex('barbell-squat', 3, [8, 10], 150),
           ex('romanian-deadlift', 3, [10, 12], 120),
@@ -124,9 +124,10 @@ export const seedPlans: WorkoutPlan[] = [
         ],
       },
       {
-        id: 'upper-b',
-        name: { it: 'Upper B', en: 'Upper B' },
-        focus: { it: 'Petto, schiena, spalle, braccia', en: 'Chest, back, shoulders, arms' },
+        focus: {
+          it: 'Parte alta: petto, schiena, spalle, braccia',
+          en: 'Upper body: chest, back, shoulders, arms',
+        },
         exercises: [
           ex('machine-chest-press', 3, [10, 12], 90),
           ex('cable-seated-row', 3, [10, 12], 90),
@@ -137,9 +138,10 @@ export const seedPlans: WorkoutPlan[] = [
         ],
       },
       {
-        id: 'lower-b',
-        name: { it: 'Lower B', en: 'Lower B' },
-        focus: { it: 'Glutei, quadricipiti, polpacci', en: 'Glutes, quads, calves' },
+        focus: {
+          it: 'Parte bassa: glutei, quadricipiti, polpacci',
+          en: 'Lower body: glutes, quads, calves',
+        },
         exercises: [
           ex('leg-press', 3, [10, 12], 120),
           ex('dumbbell-lunge', 3, [10, 12], 90, { perSide: true }),

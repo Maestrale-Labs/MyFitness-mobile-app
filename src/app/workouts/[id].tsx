@@ -24,7 +24,7 @@ export default function WorkoutPlanScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const { data: plan, isPending } = useWorkoutPlan(id);
   const { data: exercises = [] } = useExercises();
-  const [workoutIndex, setWorkoutIndex] = useState(0);
+  const [dayIndex, setDayIndex] = useState(0);
   const styles = useStyles();
   const theme = useTheme();
   const locale = useLocale();
@@ -53,11 +53,10 @@ export default function WorkoutPlanScreen() {
   const facts = [
     { icon: icons.daysPerWeek, label: t('plan.daysPerWeek', { count: plan.daysPerWeek }) },
     { icon: icons.duration, label: t('plan.weeks', { count: plan.durationWeeks }) },
-    { icon: icons.workouts, label: t('plan.workoutCount', { count: plan.workouts.length }) },
   ];
-  const workout = plan.workouts[workoutIndex] ?? plan.workouts[0];
+  const day = plan.days[dayIndex] ?? plan.days[0];
   // Skip entries whose exercise isn't in the catalog (yet), rather than showing blanks.
-  const rows = workout.exercises.flatMap((item) => {
+  const rows = day.exercises.flatMap((item) => {
     const exercise = exercisesById.get(item.exerciseId);
     return exercise ? [{ item, exercise }] : [];
   });
@@ -94,29 +93,29 @@ export default function WorkoutPlanScreen() {
         </Card>
 
         <SectionLabel>{t('plan.exercises')}</SectionLabel>
-        {plan.workouts.length > 1 ? (
+        {plan.days.length > 1 ? (
           <ScrollView
             horizontal
             showsHorizontalScrollIndicator={false}
             style={styles.chipsScroll}
             contentContainerStyle={styles.chips}>
-            {plan.workouts.map((item, index) => (
+            {plan.days.map((_, index) => (
               <Chip
-                key={item.id}
-                label={item.name[locale]}
-                selected={item.id === workout.id}
-                onPress={() => setWorkoutIndex(index)}
+                key={index}
+                label={t('plan.day', { number: index + 1 })}
+                selected={index === dayIndex}
+                onPress={() => setDayIndex(index)}
               />
             ))}
           </ScrollView>
         ) : null}
         <ThemedText type="footnote" themeColor="textSecondary" style={styles.focus}>
-          {workout.focus[locale]}
+          {day.focus[locale]}
         </ThemedText>
         <Card>
           {rows.map(({ item, exercise }, index) => (
             <PlanExerciseRow
-              key={`${workout.id}-${item.exerciseId}`}
+              key={`${dayIndex}-${item.exerciseId}`}
               index={index}
               item={item}
               exercise={exercise}
