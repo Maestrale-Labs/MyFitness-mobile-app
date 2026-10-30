@@ -36,9 +36,12 @@ Riassunto della richiesta iniziale di Valerio (il testo integrale è in fondo):
 - **Tema:** token in `src/constants/theme.ts` con sfondi crema e grigio caldo. `brand` (`#E8622C`) è l'arancione decorativo; `tint` è l'accento per testi, icone e selezioni (`#BF4417` in chiaro, `#F07A3E` in scuro), scelto per restare leggibile secondo WCAG AA.
 - **Dati degli esercizi:** le schermate leggono da `ExerciseRepository` (`src/features/exercises/repository.ts`) tramite React Query. Oggi l'implementazione è locale (`data/seed.ts`); per passare a Supabase basta scriverne una seconda.
 
-### Supabase: non ancora
+### Supabase
 
-Valerio darà più avanti un progetto Supabase, ma avrebbe preferito non doverlo fare subito. Per ora non serve: gli esercizi sono nel codice e le preferenze restano sul telefono. Diventerà necessario con le schede personalizzate e il diario, cioè quando servono account, dati legati all'utente (con regole RLS) e sincronizzazione. Il catalogo degli esercizi potrà essere pubblico in sola lettura. Il piano completo è in `docs/exercise-data.md`.
+- **Il progetto c'è** (30 ottobre 2026): ref `xkczxrhdligtguxcoitq`, URL `https://xkczxrhdligtguxcoitq.supabase.co`. L'app non lo usa ancora: gli esercizi sono nel codice e le preferenze restano sul telefono. Servirà con le schede personalizzate e il diario, cioè quando servono account, dati legati all'utente (con regole RLS) e sincronizzazione. Il catalogo degli esercizi potrà essere pubblico in sola lettura. Il piano completo è in `docs/exercise-data.md`.
+- **Chiavi nell'app:** `.env` contiene solo `EXPO_PUBLIC_SUPABASE_URL` e `EXPO_PUBLIC_SUPABASE_KEY` (la chiave *publishable*, fatta apposta per stare nel client). È nel repository, così le build EAS la trovano.
+- **Cosa non va mai nel repository** (che è pubblico) né nell'app: la chiave *service role*, la password del database e il token personale `sbp_…`. Si tengono fuori dal codice e si passano alla CLI da terminale.
+- **CLI:** `supabase/` è stato creato con `supabase init`. Per il collegamento (`supabase link --project-ref xkczxrhdligtguxcoitq`) serve un login con l'account che possiede il progetto, perché quello che era già collegato sul computer (organizzazione di Paniere e Hommy) non ha accesso.
 
 ### Il dataset degli esercizi
 
@@ -85,7 +88,7 @@ Valerio darà più avanti un progetto Supabase, ma avrebbe preferito non doverlo
 - **Nome dell'app:** per ora è «Fitness». Icona e splash sono ancora quelli del template Expo.
 - **Animazioni:** licenza Gym visual, oppure un'altra fonte per le immagini?
 - **Testi legali** definitivi e URL della privacy policy.
-- **Progetto Supabase:** arriverà quando si inizia con schede e diario.
+- **Progetto Supabase:** creato, ma ancora da collegare alla CLI e da usare nell'app (vedi «Supabase»).
 
 ## Come si lavora su questo progetto
 
@@ -100,6 +103,7 @@ Valerio darà più avanti un progetto Supabase, ma avrebbe preferito non doverlo
 1. **Richiesta iniziale.** Valerio presenta l'app (testo integrale qui sotto). Viene creata la base: due tab, 2 esercizi dal dataset, profilo, tema arancione, IT/EN. Lint, typecheck e bundle iOS/Android/web passano, e il flusso è provato nell'anteprima web. Non è stata provata su un dispositivo reale.
 2. **Feedback.** «Come UI ancora non ci siamo… se ti guardi come abbiamo fatto Paniere puoi molto migliorare l'applicazione… la bottom navigation non va bene». Valerio sceglie di dare accesso al repo di Paniere e vuole la barra in basso come quella di Paniere. Il repo non era però collegabile dalla sessione cloud.
 3. **Passaggio al computer locale.** Valerio chiede di salvare in questo file tutto quello che ci si è detti, per riprendere la chat dal suo computer con accesso a tutti i repository.
+4. **Supabase.** Dal computer locale si verifica che commit e push funzionano. Valerio fornisce il progetto Supabase: URL e chiave pubblica vanno in `.env` e viene creata la cartella `supabase/`. Il collegamento della CLI resta da fare.
 
 ### Richiesta iniziale (testo integrale)
 
