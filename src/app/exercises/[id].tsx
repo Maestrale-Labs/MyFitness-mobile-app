@@ -1,5 +1,6 @@
 import { Image } from 'expo-image';
 import { useLocalSearchParams } from 'expo-router';
+import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ActivityIndicator, ScrollView, StyleSheet, Text, View } from 'react-native';
 
@@ -11,6 +12,7 @@ import { SubScreenHeader } from '@/components/sub-screen-header';
 import { ThemedText } from '@/components/themed-text';
 import { icons } from '@/constants/icons';
 import { Spacing } from '@/constants/theme';
+import { track } from '@/features/analytics/client';
 import { useExercise } from '@/features/exercises/queries';
 import { makeStyles } from '@/hooks/use-styles';
 import { useTheme } from '@/hooks/use-theme';
@@ -23,6 +25,10 @@ export default function ExerciseDetailScreen() {
   const theme = useTheme();
   const locale = useLocale();
   const { t } = useTranslation();
+
+  useEffect(() => {
+    track('exercise_viewed', { exerciseId: id });
+  }, [id]);
 
   if (isPending || !exercise) {
     return (

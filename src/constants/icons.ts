@@ -7,6 +7,7 @@ import {
   BodyPartMuscleIcon,
   Calendar03Icon,
   CancelCircleIcon,
+  ChartLineData01Icon,
   CheckmarkCircle02Icon,
   CircleIcon,
   Clock01Icon,
@@ -61,4 +62,5 @@ export const icons = {
   version: InformationCircleIcon,
   terms: File01Icon,
   privacy: Shield01Icon,
+  analytics: ChartLineData01Icon,
 } as const;

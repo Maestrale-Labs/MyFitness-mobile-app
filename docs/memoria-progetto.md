@@ -12,6 +12,7 @@ Ultimo aggiornamento: 30 ottobre 2026.
 - Paniere non era raggiungibile dalla sessione cloud in cui è nata l'app (vedi «Paniere» più sotto). Ora è in locale in `../paniere-mobile-app`.
 - L'app è collegata al progetto Expo `@maestrale-lab/fitness` e ha il suo `eas.json` (vedi «Expo, EAS e App Store»).
 - La tabella Supabase degli esercizi è pronta come migrazione in `supabase/migrations/` (con i 2 esercizi di prova) ed è stata provata su un Postgres locale. **Non è ancora applicata al progetto**, e l'app legge ancora gli esercizi dal codice. Ora nel codice gli esercizi sono 36 e c'è il campo nuovo `muscleGroup`: prima di applicare le migrazioni vanno aggiornate tutte e due le cose.
+- Ci sono le **statistiche anonime d'uso** (installazioni, utenti attivi, ritorni, eventi), inviate a Supabase senza account: vedi «Statistiche anonime» e `docs/analytics.md`. La migrazione `analytics` è scritta ma **va ancora applicata** (`npx supabase db push --linked`); finché non lo è, gli eventi restano in coda sul telefono.
 - Il repository GitHub è stato rinominato da `Maestrale-Labs/Fitness` a `Maestrale-Labs/MyFitness-mobile-app`.
 
 **Prossimi passi** (si parte da quello che si sblocca prima):
@@ -52,7 +53,7 @@ Riassunto della richiesta iniziale di Valerio (il testo integrale è in fondo):
 - **Il progetto c'è** (30 ottobre 2026): ref `xkczxrhdligtguxcoitq`, URL `https://xkczxrhdligtguxcoitq.supabase.co`. L'app non lo usa ancora: gli esercizi sono nel codice e le preferenze restano sul telefono. Servirà con le schede personalizzate e il diario, cioè quando servono account, dati legati all'utente (con regole RLS) e sincronizzazione. Il catalogo degli esercizi potrà essere pubblico in sola lettura. Il piano completo è in `docs/exercise-data.md`.
 - **Chiavi nell'app:** `.env` contiene solo `EXPO_PUBLIC_SUPABASE_URL` e `EXPO_PUBLIC_SUPABASE_KEY` (la chiave _publishable_, fatta apposta per stare nel client). È nel repository, così le build EAS la trovano.
 - **Cosa non va mai nel repository** (che è pubblico) né nell'app: la chiave _service role_, la password del database e il token personale `sbp_…`. Si tengono fuori dal codice e si passano alla CLI da terminale.
-- **CLI:** `supabase/` è stato creato con `supabase init`. Per il collegamento (`supabase link --project-ref xkczxrhdligtguxcoitq`) serve un login con l'account che possiede il progetto, perché quello che era già collegato sul computer (organizzazione di Paniere e Hommy) non ha accesso.
+- **CLI:** `supabase/` è stato creato con `supabase init`. Dal 30 ottobre 2026 la CLI sul computer di Valerio è **collegata** al progetto (`npx supabase link --project-ref xkczxrhdligtguxcoitq`, senza bisogno della password del database). Le migrazioni si applicano con `npx supabase db push --linked`.
 - **Tabelle:** si definiscono solo come migrazioni in `supabase/migrations/` e si applicano con `npx supabase db push`. La prima è `public.exercises`, il catalogo pubblico:
   - lettura per tutti, anche senza account;
   - nessuna scrittura con le chiavi dell'app;
@@ -65,6 +66,15 @@ Riassunto della richiesta iniziale di Valerio (il testo integrale è in fondo):
   - un token come variabile d'ambiente segreta, da non scrivere mai in chat o nel repository.
 
   In alternativa le migrazioni si applicano dal computer.
+
+### Statistiche anonime
+
+Decise con Valerio il 30 ottobre 2026. Il percorso dell'utente (schede scelte, allenamenti fatti) resta **sul telefono** finché non ci sono gli account; a Supabase arrivano solo statistiche anonime, che servono a Valerio per sapere quante persone usano davvero l'app:
+
+- installazioni, utenti attivi al giorno, alla settimana e al mese, quanti tornano;
+- eventi: oggi `app_open`, `plan_viewed`, `exercise_viewed`; in arrivo `plan_added`, `workout_completed`, `plan_completed`.
+
+Ogni installazione ha un codice casuale, senza dati personali. Si possono disattivare da Profilo › Privacy. Privacy policy e termini lo spiegano. Tutti i dettagli (tabelle, viste, query) sono in `docs/analytics.md`.
 
 ### Account e uso senza registrazione
 
@@ -200,6 +210,7 @@ Decise il 30 ottobre 2026:
 9. **Schede.** Valerio chiede le prime schede, per l'aumento muscolare e di livello principiante, in una nuova sezione della navigazione («My Workout, qualcosa di questo genere»). Si aggiunge la tab **Allenamenti** con 2 schede, Full body (3 giorni) e Upper/Lower (4 giorni). Si caricano i 6 esercizi che mancavano, per un totale di 36.
 10. **Allenamenti per primi e schede a giorni.** Valerio chiede di mettere Allenamenti come prima sezione e di dividere le schede per giorni (Giorno 1, 2, 3) invece che in allenamento A e B, «pazienza se giorno 1 è uguale al giorno 3».
 11. **«Schede».** Valerio fa rinominare la sezione «I miei allenamenti» in «Schede», perché lì ci sono le schede. Chiede anche se si può già «aggiungere una scheda al proprio percorso» e vederla in una home, o se serve prima il login.
+12. **Statistiche anonime.** Valerio vuole sapere quante persone usano l'app senza obbligarle a registrarsi. Si decide: percorso salvato sul telefono, e un contatore anonimo su Supabase con installazioni, utenti attivi, ritorni ed eventi. Si collega la CLI di Supabase, si scrive la migrazione `analytics`, si aggiungono il tracciamento nell'app, l'interruttore nel profilo e i testi in privacy e termini.
 
 ### Richiesta iniziale (testo integrale)
 

@@ -8,6 +8,7 @@ import { Icon } from '@/components/icon';
 import { Screen } from '@/components/screen';
 import { SectionLabel } from '@/components/section-label';
 import { SettingsRow } from '@/components/settings-row';
+import { SwitchRow } from '@/components/switch-row';
 import { ThemedText } from '@/components/themed-text';
 import { icons } from '@/constants/icons';
 import { Spacing } from '@/constants/theme';
@@ -41,6 +42,8 @@ export default function ProfileScreen() {
   const name = useSettings((state) => state.name.trim());
   const themePreference = useSettings((state) => state.theme);
   const languagePreference = useSettings((state) => state.language);
+  const analyticsEnabled = useSettings((state) => state.analyticsEnabled);
+  const setAnalyticsEnabled = useSettings((state) => state.setAnalyticsEnabled);
 
   return (
     <Screen>
@@ -89,6 +92,18 @@ export default function ProfileScreen() {
             label={t('profile.theme')}
             value={t(`theme.${themePreference}`)}
             onPress={() => router.push('/profile/theme')}
+            last
+          />
+        </Card>
+
+        <SectionLabel>{t('profile.sectionPrivacy')}</SectionLabel>
+        <Card>
+          <SwitchRow
+            icon={icons.analytics}
+            label={t('profile.analytics')}
+            subtitle={t('profile.analyticsSubtitle')}
+            value={analyticsEnabled}
+            onValueChange={setAnalyticsEnabled}
             last
           />
         </Card>

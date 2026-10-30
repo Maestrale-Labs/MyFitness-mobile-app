@@ -1,5 +1,5 @@
 import { useLocalSearchParams } from 'expo-router';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ActivityIndicator, ScrollView, StyleSheet, Text, View } from 'react-native';
 
@@ -12,6 +12,7 @@ import { SubScreenHeader } from '@/components/sub-screen-header';
 import { ThemedText } from '@/components/themed-text';
 import { icons } from '@/constants/icons';
 import { Spacing } from '@/constants/theme';
+import { track } from '@/features/analytics/client';
 import { useExercises } from '@/features/exercises/queries';
 import { PlanExerciseRow } from '@/features/workouts/components/plan-exercise-row';
 import { PlanTags } from '@/features/workouts/components/plan-tags';
@@ -34,6 +35,10 @@ export default function WorkoutPlanScreen() {
     () => new Map(exercises.map((exercise) => [exercise.id, exercise])),
     [exercises],
   );
+
+  useEffect(() => {
+    track('plan_viewed', { planId: id });
+  }, [id]);
 
   if (isPending || !plan) {
     return (

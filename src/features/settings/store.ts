@@ -10,9 +10,12 @@ type SettingsState = {
   name: string;
   theme: ThemePreference;
   language: LanguagePreference;
+  /** Anonymous usage statistics (src/features/analytics). On unless turned off. */
+  analyticsEnabled: boolean;
   setName: (name: string) => void;
   setTheme: (theme: ThemePreference) => void;
   setLanguage: (language: LanguagePreference) => void;
+  setAnalyticsEnabled: (enabled: boolean) => void;
 };
 
 /**
@@ -25,15 +28,22 @@ export const useSettings = create<SettingsState>()(
       name: '',
       theme: 'system',
       language: 'system',
+      analyticsEnabled: true,
       setName: (name) => set({ name }),
       setTheme: (theme) => set({ theme }),
       setLanguage: (language) => set({ language }),
+      setAnalyticsEnabled: (analyticsEnabled) => set({ analyticsEnabled }),
     }),
     {
       name: 'settings',
       version: 1,
       storage: createJSONStorage(() => AsyncStorage),
-      partialize: ({ name, theme, language }) => ({ name, theme, language }),
+      partialize: ({ name, theme, language, analyticsEnabled }) => ({
+        name,
+        theme,
+        language,
+        analyticsEnabled,
+      }),
     },
   ),
 );

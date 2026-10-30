@@ -64,6 +64,7 @@ export const en: Translations = {
     title: 'Profile',
     namePlaceholderTitle: 'Add your name',
     sectionPreferences: 'Preferences',
+    sectionPrivacy: 'Privacy',
     sectionInfo: 'About',
     sectionLegal: 'Legal',
     name: 'Name',
@@ -74,6 +75,8 @@ export const en: Translations = {
     terms: 'Terms & Conditions',
     privacy: 'Privacy Policy',
     version: 'Version',
+    analytics: 'Anonymous statistics',
+    analyticsSubtitle: 'They help us improve the app. No personal data.',
   },
   theme: {
     system: 'Automatic',

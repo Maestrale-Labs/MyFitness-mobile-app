@@ -5,6 +5,7 @@ import { StatusBar } from 'expo-status-bar';
 import { useEffect } from 'react';
 
 import { Colors, type ColorScheme } from '@/constants/theme';
+import { useAnalyticsLifecycle } from '@/features/analytics/use-analytics-lifecycle';
 import { useSettingsHydrated } from '@/features/settings/store';
 import { useApplyColorSchemePreference, useColorScheme } from '@/hooks/use-color-scheme';
 import { useSyncLanguagePreference } from '@/i18n';
@@ -36,6 +37,7 @@ export default function RootLayout() {
 
   useApplyColorSchemePreference();
   useSyncLanguagePreference();
+  useAnalyticsLifecycle();
 
   useEffect(() => {
     if (hydrated) {

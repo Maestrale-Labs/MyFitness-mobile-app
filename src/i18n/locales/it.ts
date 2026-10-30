@@ -63,6 +63,7 @@ export const it = {
     title: 'Profilo',
     namePlaceholderTitle: 'Aggiungi il tuo nome',
     sectionPreferences: 'Preferenze',
+    sectionPrivacy: 'Privacy',
     sectionInfo: 'Informazioni',
     sectionLegal: 'Legale',
     name: 'Nome',
@@ -73,6 +74,8 @@ export const it = {
     terms: 'Termini e condizioni',
     privacy: 'Privacy policy',
     version: 'Versione',
+    analytics: 'Statistiche anonime',
+    analyticsSubtitle: 'Ci aiutano a migliorare l’app. Nessun dato personale.',
   },
   theme: {
     system: 'Automatico',

@@ -41,6 +41,13 @@ export const legalDocuments: Record<LegalDocumentId, LegalDocument> = {
         },
       },
       {
+        heading: { it: 'Statistiche d’uso', en: 'Usage statistics' },
+        body: {
+          it: 'Per migliorare l’app raccogliamo statistiche anonime d’uso, come descritto nella privacy policy. Puoi disattivarle dal profilo.',
+          en: 'To improve the app we collect anonymous usage statistics, as described in the privacy policy. You can turn them off from your profile.',
+        },
+      },
+      {
         heading: { it: 'Modifiche', en: 'Changes' },
         body: {
           it: 'Questi termini possono essere aggiornati. La versione in vigore è sempre disponibile in questa pagina.',
@@ -55,8 +62,22 @@ export const legalDocuments: Record<LegalDocumentId, LegalDocument> = {
       {
         heading: { it: 'Dati salvati sul dispositivo', en: 'Data stored on your device' },
         body: {
-          it: 'Al momento l’app salva solo sul tuo dispositivo il nome che inserisci e le preferenze di tema e lingua. Questi dati non vengono inviati a nessun server.',
-          en: 'Right now the app only stores the name you enter and your theme and language preferences, on your device. This data is not sent to any server.',
+          it: 'Il nome che inserisci e le preferenze di tema e lingua restano salvati solo sul tuo dispositivo e non vengono inviati a nessun server.',
+          en: 'The name you enter and your theme and language preferences are stored only on your device and are not sent to any server.',
+        },
+      },
+      {
+        heading: { it: 'Statistiche anonime d’uso', en: 'Anonymous usage statistics' },
+        body: {
+          it: 'Per capire quante persone usano l’app e quali funzioni sono più utili, al primo avvio l’app crea un codice casuale che resta sul dispositivo. Insieme a questo codice invia alcuni eventi d’uso: l’apertura dell’app, le schede e gli esercizi visualizzati e, più avanti, le schede aggiunte e gli allenamenti completati. Invia anche la data e l’ora, il sistema operativo, la versione dell’app e la lingua del dispositivo. Non raccogliamo nome, email, posizione o identificativi del dispositivo, e non usiamo questi dati per pubblicità né li condividiamo con terzi. I dati sono conservati su Supabase, il nostro fornitore di database, con server a Londra.',
+          en: 'To understand how many people use the app and which features help most, on first launch the app creates a random code that stays on your device. Along with this code it sends a few usage events: opening the app, the plans and exercises you view and, later on, the plans you add and the workouts you complete. It also sends the date and time, the operating system, the app version and the device language. We do not collect your name, email, location or device identifiers, and we do not use this data for advertising or share it with third parties. The data is stored with Supabase, our database provider, on servers in London.',
+        },
+      },
+      {
+        heading: { it: 'Disattivare le statistiche', en: 'Turning statistics off' },
+        body: {
+          it: 'Puoi disattivare le statistiche in qualsiasi momento da Profilo › Statistiche anonime: da quel momento l’app non invia più nulla e cancella gli eventi non ancora inviati.',
+          en: 'You can turn statistics off at any time in Profile › Anonymous statistics: from then on the app sends nothing and deletes any events not yet sent.',
         },
       },
       {
@@ -69,8 +90,8 @@ export const legalDocuments: Record<LegalDocumentId, LegalDocument> = {
       {
         heading: { it: 'Cancellazione', en: 'Deleting your data' },
         body: {
-          it: 'Puoi cancellare questi dati in qualsiasi momento eliminando l’app dal dispositivo.',
-          en: 'You can delete this data at any time by removing the app from your device.',
+          it: 'Puoi cancellare i dati salvati sul dispositivo, compreso il codice casuale, eliminando l’app. Le statistiche già inviate non sono collegate a te e restano solo in forma anonima.',
+          en: 'You can delete the data stored on your device, including the random code, by removing the app. Statistics already sent are not linked to you and remain only in anonymous form.',
         },
       },
     ],
