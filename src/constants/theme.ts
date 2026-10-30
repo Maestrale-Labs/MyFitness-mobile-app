@@ -1,5 +1,6 @@
 /**
- * Design tokens. Warm neutrals with an orange brand accent.
+ * Design tokens, modelled on Paniere: cool neutral greys, white cards with soft shadows,
+ * and a single brand color (orange).
  *
  * - `brand` is the signature orange, for decorative fills (icons, splash, illustrations).
  * - `tint` is the accent for text, icons and selected fills: darker in light mode and
@@ -19,24 +20,26 @@ export const Colors = {
     tint: '#BF4417',
     onTint: '#FFFFFF',
     brandSoft: '#FEF0E8',
-    background: '#FAF9F5',
+    background: '#F1F1F4',
     surface: '#FFFFFF',
-    surfaceMuted: '#F0EEE6',
-    text: '#1F1E1D',
-    textSecondary: '#6B6A65',
-    separator: '#E6E3DA',
+    surfaceMuted: '#E9E9EE',
+    text: '#111111',
+    heading: '#25282C',
+    textSecondary: '#6E6E73',
+    separator: '#E5E5EA',
   },
   dark: {
     brand,
     tint: '#F07A3E',
-    onTint: '#1A1918',
+    onTint: '#101214',
     brandSoft: '#3A2419',
-    background: '#1A1918',
-    surface: '#262624',
-    surfaceMuted: '#30302E',
-    text: '#F5F4EF',
-    textSecondary: '#A6A39A',
-    separator: '#3A3936',
+    background: '#101214',
+    surface: '#1B1E21',
+    surfaceMuted: '#2A2E33',
+    text: '#F3F4F5',
+    heading: '#E6E8EA',
+    textSecondary: '#9BA1A8',
+    separator: '#2E3338',
   },
 } as const;
 
@@ -77,11 +80,42 @@ export const Spacing = {
 } as const;
 
 export const Radius = {
-  small: 8,
-  medium: 12,
-  large: 16,
-  extraLarge: 24,
+  small: 10,
+  medium: 14,
+  large: 18,
   pill: 999,
+} as const;
+
+export const Shadows = {
+  /** Cards and round buttons. */
+  card: {
+    shadowColor: '#000000',
+    shadowOpacity: 0.05,
+    shadowRadius: 8,
+    shadowOffset: { width: 0, height: 2 },
+    elevation: 2,
+  },
+  /** Elements floating over the content: the tab bar. */
+  floating: {
+    shadowColor: '#000000',
+    shadowOpacity: 0.12,
+    shadowRadius: 16,
+    shadowOffset: { width: 0, height: 6 },
+    elevation: 10,
+  },
+} as const;
+
+/** The floating pill tab bar. Screens under the tabs make room for it with `useTabBarInset()`. */
+export const TabBar = {
+  height: 61,
+  widthRatio: 0.9,
+  maxWidth: 440,
+  marginHorizontal: 14,
+  iconSize: 22,
+  // On phones with a home indicator the bar overlaps part of the safe area;
+  // on the others it keeps a minimum margin.
+  minBottomMargin: 10,
+  safeAreaOverlap: 14,
 } as const;
 
 export const MaxContentWidth = 720;

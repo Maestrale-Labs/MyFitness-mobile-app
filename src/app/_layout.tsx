@@ -1,10 +1,9 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { DarkTheme, DefaultTheme, ThemeProvider, type Theme } from 'expo-router';
+import { DarkTheme, DefaultTheme, Stack, ThemeProvider, type Theme } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
 import { useEffect } from 'react';
 
-import AppTabs from '@/components/app-tabs';
 import { Colors, type ColorScheme } from '@/constants/theme';
 import { useSettingsHydrated } from '@/features/settings/store';
 import { useApplyColorSchemePreference, useColorScheme } from '@/hooks/use-color-scheme';
@@ -49,11 +48,24 @@ export default function RootLayout() {
     return null;
   }
 
+  // As in Paniere: no native headers. Tab screens draw their own title, pushed pages
+  // use `SubScreenHeader`, and pushed pages cover the floating tab bar.
   return (
     <QueryClientProvider client={queryClient}>
       <ThemeProvider value={navigationTheme(scheme)}>
         <StatusBar style={scheme === 'dark' ? 'light' : 'dark'} />
-        <AppTabs />
+        <Stack
+          screenOptions={{
+            headerShown: false,
+            contentStyle: { backgroundColor: Colors[scheme].background },
+          }}>
+          <Stack.Screen name="(tabs)" />
+          <Stack.Screen name="exercises/[id]" />
+          <Stack.Screen name="profile/name" />
+          <Stack.Screen name="profile/theme" />
+          <Stack.Screen name="profile/language" />
+          <Stack.Screen name="profile/legal/[document]" />
+        </Stack>
       </ThemeProvider>
     </QueryClientProvider>
   );

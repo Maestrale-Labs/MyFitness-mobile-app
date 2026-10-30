@@ -1,77 +1,76 @@
 import { Image } from 'expo-image';
 import { Link } from 'expo-router';
 import { useTranslation } from 'react-i18next';
-import { Pressable, StyleSheet, View } from 'react-native';
+import { Pressable, Text, View } from 'react-native';
 
+import { Card } from '@/components/card';
 import { Icon } from '@/components/icon';
-import { ThemedText } from '@/components/themed-text';
+import { icons } from '@/constants/icons';
 import { Radius, Spacing } from '@/constants/theme';
+import { makeStyles } from '@/hooks/use-styles';
 import { useTheme } from '@/hooks/use-theme';
 import { useLocale } from '@/i18n';
 
 import type { Exercise } from '../types';
 
 export function ExerciseRow({ exercise }: { exercise: Exercise }) {
+  const styles = useStyles();
   const theme = useTheme();
   const locale = useLocale();
   const { t } = useTranslation();
 
   return (
-    <Link href={{ pathname: '/exercises/[id]', params: { id: exercise.id } }} asChild>
-      <Pressable accessibilityRole="link">
-        {({ pressed }) => (
-          // Styles go on an inner view: `Link asChild` doesn't forward a style function on web.
-          <View
-            style={[styles.row, { backgroundColor: pressed ? theme.surfaceMuted : theme.surface }]}>
-            {/* The media has a white background, so it sits on white in dark mode too. */}
-            <View style={styles.thumbnailFrame}>
-              <Image
-                source={exercise.media.thumbnail}
-                style={styles.thumbnail}
-                contentFit="contain"
-                transition={150}
-                accessibilityIgnoresInvertColors
-              />
-            </View>
-            <View style={styles.text}>
-              <ThemedText type="headline" numberOfLines={2}>
-                {exercise.name[locale]}
-              </ThemedText>
-              <ThemedText type="subhead" themeColor="textSecondary" numberOfLines={1}>
-                {t(`bodyPart.${exercise.bodyPart}`)} · {t(`equipment.${exercise.equipment}`)}
-              </ThemedText>
-              <View style={[styles.tag, { backgroundColor: theme.brandSoft }]}>
-                <ThemedText type="caption" themeColor="tint" style={styles.tagText}>
-                  {t(`muscle.${exercise.targetMuscle}`)}
-                </ThemedText>
+    <Card>
+      <Link href={{ pathname: '/exercises/[id]', params: { id: exercise.id } }} asChild>
+        <Pressable accessibilityRole="link">
+          {({ pressed }) => (
+            // Styles go on an inner view: `Link asChild` doesn't forward a style function on web.
+            <View style={[styles.row, pressed && styles.rowPressed]}>
+              {/* The media has a white background, so it sits on white in dark mode too. */}
+              <View style={styles.thumbnailFrame}>
+                <Image
+                  source={exercise.media.thumbnail}
+                  style={styles.thumbnail}
+                  contentFit="contain"
+                  transition={150}
+                  accessibilityIgnoresInvertColors
+                />
               </View>
+              <View style={styles.text}>
+                <Text numberOfLines={2} style={styles.name}>
+                  {exercise.name[locale]}
+                </Text>
+                <Text numberOfLines={1} style={styles.meta}>
+                  {t(`bodyPart.${exercise.bodyPart}`)} · {t(`equipment.${exercise.equipment}`)}
+                </Text>
+                <View style={styles.tag}>
+                  <Text style={styles.tagText}>{t(`muscle.${exercise.targetMuscle}`)}</Text>
+                </View>
+              </View>
+              <Icon icon={icons.chevronRight} size={18} color={theme.textSecondary} />
             </View>
-            <Icon
-              name={{ ios: 'chevron.right', android: 'chevron_right' }}
-              size={14}
-              weight="semibold"
-              color={theme.textSecondary}
-            />
-          </View>
-        )}
-      </Pressable>
-    </Link>
+          )}
+        </Pressable>
+      </Link>
+    </Card>
   );
 }
 
-const styles = StyleSheet.create({
+const useStyles = makeStyles((theme) => ({
   row: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: Spacing.four,
+    gap: Spacing.three,
     padding: Spacing.three,
     paddingRight: Spacing.four,
-    borderRadius: Radius.large,
+  },
+  rowPressed: {
+    backgroundColor: theme.background,
   },
   thumbnailFrame: {
-    width: 76,
-    height: 76,
-    borderRadius: Radius.medium,
+    width: 72,
+    height: 72,
+    borderRadius: Radius.small,
     backgroundColor: '#FFFFFF',
     overflow: 'hidden',
   },
@@ -81,16 +80,28 @@ const styles = StyleSheet.create({
   },
   text: {
     flex: 1,
-    gap: Spacing.half,
+    gap: 2,
     alignItems: 'flex-start',
+  },
+  name: {
+    fontSize: 16,
+    fontWeight: 500,
+    color: theme.text,
+  },
+  meta: {
+    fontSize: 13,
+    color: theme.textSecondary,
   },
   tag: {
     marginTop: Spacing.one,
     paddingHorizontal: Spacing.two,
-    paddingVertical: Spacing.half,
+    paddingVertical: 2,
     borderRadius: Radius.pill,
+    backgroundColor: theme.brandSoft,
   },
   tagText: {
+    fontSize: 12,
     fontWeight: 600,
+    color: theme.tint,
   },
-});
+}));

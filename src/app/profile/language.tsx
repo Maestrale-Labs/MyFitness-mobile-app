@@ -12,6 +12,7 @@ export default function LanguageScreen() {
 
   return (
     <OptionListScreen
+      title={t('profile.language')}
       options={OPTIONS.map((value) => ({ value, label: t(`language.${value}`) }))}
       selected={language}
       onSelect={setLanguage}

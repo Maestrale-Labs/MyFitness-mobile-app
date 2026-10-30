@@ -20,15 +20,12 @@ export type ThemedTextProps = TextProps & {
   themeColor?: ThemeColor;
 };
 
-export function ThemedText({
-  style,
-  type = 'body',
-  themeColor = 'text',
-  ...rest
-}: ThemedTextProps) {
+export function ThemedText({ style, type = 'body', themeColor, ...rest }: ThemedTextProps) {
   const theme = useTheme();
+  // Titles are a shade lighter than body text, as in Paniere.
+  const color = theme[themeColor ?? (type === 'title' ? 'heading' : 'text')];
 
-  return <Text style={[{ color: theme[themeColor] }, styles[type], style]} {...rest} />;
+  return <Text style={[{ color }, styles[type], style]} {...rest} />;
 }
 
 const styles = StyleSheet.create({
@@ -37,10 +34,12 @@ const styles = StyleSheet.create({
     lineHeight: 41,
     fontWeight: 700,
   },
+  // Tab titles: medium weight, so they don't feel heavy.
   title: {
     fontSize: 28,
     lineHeight: 34,
-    fontWeight: 700,
+    fontWeight: 500,
+    letterSpacing: -0.3,
   },
   title2: {
     fontSize: 22,

@@ -1,22 +1,30 @@
-import { SymbolView, type AndroidSymbol, type SymbolViewProps } from 'expo-symbols';
-import type { ColorValue } from 'react-native';
-import type { SFSymbol } from 'sf-symbols-typescript';
+import { HugeiconsIcon, type IconSvgElement } from '@hugeicons/react-native';
+import type { ColorValue, StyleProp, ViewStyle } from 'react-native';
 
-/** SF Symbol on iOS, Material Symbol on Android (and on the web preview). */
-export type IconName = { ios: SFSymbol; android: AndroidSymbol };
+import { useTheme } from '@/hooks/use-theme';
 
-type IconProps = Omit<SymbolViewProps, 'name' | 'tintColor'> & {
-  name: IconName;
-  color: ColorValue;
+export type IconData = IconSvgElement;
+
+type IconProps = {
+  icon: IconData;
+  size?: number;
+  /** Defaults to the theme's text color. */
+  color?: ColorValue;
+  strokeWidth?: number;
+  style?: StyleProp<ViewStyle>;
 };
 
-export function Icon({ name, color, size = 22, ...rest }: IconProps) {
+/** The only place icons are rendered: pick them in `src/constants/icons.ts`. */
+export function Icon({ icon, size = 22, color, strokeWidth = 1.6, style }: IconProps) {
+  const theme = useTheme();
+
   return (
-    <SymbolView
-      name={{ ios: name.ios, android: name.android, web: name.android }}
-      tintColor={color}
+    <HugeiconsIcon
+      icon={icon}
       size={size}
-      {...rest}
+      color={color ?? theme.text}
+      strokeWidth={strokeWidth}
+      style={style}
     />
   );
 }

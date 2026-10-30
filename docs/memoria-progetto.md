@@ -7,7 +7,7 @@ Ultimo aggiornamento: 30 ottobre 2026.
 ## Dove siamo arrivati
 
 - La base dell'app c'è: tab **Esercizi** (lista, ricerca, filtro, dettaglio con GIF) e tab **Profilo** (nome, tema, lingua, termini, privacy, versione). Il primo commit è `986624b` sul branch `claude/tender-archimedes-lr4kab`.
-- Valerio ha visto il risultato e **la UI non lo convince ancora**: va rifatta prendendo lo stile da **Paniere**, a partire dalla **barra di navigazione in basso**, che non va bene.
+- Valerio ha visto il primo risultato e la UI non lo convinceva, a partire dalla barra di navigazione in basso. **La UI è stata rifatta con lo stile di Paniere** (30 ottobre 2026): barra a pillola flottante, card bianche, righe in stile impostazioni, icone Hugeicons. Va ancora vista da Valerio su un telefono.
 - Paniere non era raggiungibile dalla sessione cloud in cui è nata l'app (vedi «Paniere» più sotto). Ora è in locale in `../paniere-mobile-app`.
 - L'app è collegata al progetto Expo `@maestrale-lab/fitness` e ha il suo `eas.json` (vedi «Expo, EAS e App Store»).
 - La tabella Supabase degli esercizi è pronta come migrazione in `supabase/migrations/` (con i 2 esercizi di prova) ed è stata provata su un Postgres locale. **Non è ancora applicata al progetto**, e l'app legge ancora gli esercizi dal codice.
@@ -15,7 +15,7 @@ Ultimo aggiornamento: 30 ottobre 2026.
 
 **Prossimi passi** (si parte da quello che si sblocca prima):
 
-- studiare Paniere e rifare la UI di Fitness nello stesso stile;
+- far vedere a Valerio la nuova UI sul telefono (Expo Go) e correggere quello che non va;
 - applicare le migrazioni a Supabase e far leggere gli esercizi all'app da lì.
 
 I dettagli sono in «Cosa fare adesso».
@@ -38,10 +38,12 @@ Riassunto della richiesta iniziale di Valerio (il testo integrale è in fondo):
 ### Tecnologia
 
 - **Expo SDK 58**, Expo Router, TypeScript, React 19.3, React Native 0.88. Le cartelle `ios/` e `android/` non si scrivono a mano: le genera Expo.
-- **Tab native** (`expo-router/native-tabs`): su iOS la tab bar di sistema con le SF Symbols, su Android quella Material. Sul web, che è solo un'anteprima di sviluppo, c'è una barra fatta a mano in `src/components/app-tabs.web.tsx`. Visto il feedback, questa scelta va rivista sulla base di Paniere.
+- **Navigazione come Paniere:** c'è uno Stack alla radice senza header nativi. Le tab sono in `src/app/(tabs)/` e usano `expo-router/js-tabs` con la barra a pillola `src/components/floating-tab-bar.tsx`, la stessa su iOS, Android e web. Le sotto-pagine (`exercises/[id]`, `profile/*`) sono rotte dello Stack con `SubScreenHeader`. Le tab native di prima sono state tolte su richiesta di Valerio.
+- **UI condivisa** (`src/components/`): `Screen`, `Card`, `SettingsRow`, `SectionLabel`, `SubScreenHeader`, `SearchField`, `Chip`. Gli stili che dipendono dal tema si scrivono con `makeStyles()` (`src/hooks/use-styles.ts`).
+- **Icone:** Hugeicons come Paniere (`@hugeicons/react-native` e `react-native-svg`), scelte tutte in `src/constants/icons.ts` e disegnate con `Icon` (`src/components/icon.tsx`). Funzionano anche in Expo Go.
 - **Lingue:** i18next. `src/i18n/locales/it.ts` è il riferimento ed `en.ts` è tipizzato contro di esso. La lingua «automatica» segue quella del dispositivo; se non è italiano o inglese si usa l'inglese.
 - **Preferenze** (nome, tema, lingua): zustand salvato con AsyncStorage (`src/features/settings/store.ts`). Lo splash resta visibile finché le preferenze non sono state lette, per evitare un lampo del tema sbagliato.
-- **Tema:** token in `src/constants/theme.ts` con sfondi crema e grigio caldo. `brand` (`#E8622C`) è l'arancione decorativo; `tint` è l'accento per testi, icone e selezioni (`#BF4417` in chiaro, `#F07A3E` in scuro), scelto per restare leggibile secondo WCAG AA.
+- **Tema:** token in `src/constants/theme.ts` con i neutri freddi di Paniere (fondo `#F1F1F4`, card bianche; in scuro `#101214` e `#1B1E21`), ombre (`Shadows`) e misure della barra (`TabBar`). `brand` (`#E8622C`) è l'arancione decorativo; `tint` è l'accento per testi, icone e selezioni (`#BF4417` in chiaro, `#F07A3E` in scuro), scelto per restare leggibile secondo WCAG AA.
 - **Dati degli esercizi:** le schermate leggono da `ExerciseRepository` (`src/features/exercises/repository.ts`) tramite React Query. Oggi l'implementazione è locale (`data/seed.ts`); per passare a Supabase basta scriverne una seconda.
 
 ### Supabase
@@ -116,17 +118,23 @@ Deciso con Valerio il 30 ottobre 2026:
 - **Cosa non è:** `foddai0/panormus` è un gioco in Godot (un open world a Palermo), non c'entra.
 - **Dove sta:** sul computer di Valerio, in `../paniere-mobile-app` accanto a questo progetto (progetto Expo `@maestrale-lab/paniere`).
 
+### Lo stile di Paniere (studiato il 30 ottobre 2026)
+
+- **Barra in basso:** non è quella nativa. Usa le tab JavaScript (`expo-router/js-tabs`) con una barra fatta a mano (`floating-tab-bar.tsx`): una **pillola flottante** bianca, alta 61 e larga il 90%, con ombra, staccata dal fondo. La voce attiva ha una pillola grigia (`surfaceMuted`) dietro icona ed etichetta. Le icone e i testi sono sempre del colore del testo e non del brand; l'attiva si riconosce dalla pillola e dal tratto più spesso dell'icona (2 contro 1,5). Etichette a 10 pt, peso 600. Le schermate sotto le tab lasciano spazio in fondo con `useTabBarInset()`.
+- **Navigazione:** c'è uno Stack alla radice con `headerShown: false`. Le tab stanno in `(tabs)/` e le sotto-pagine sono rotte dello Stack, che quando si aprono coprono la barra. Non ci sono header nativi: il titolo della tab sta nella schermata (28 pt, peso 500, colore `heading`). Le sotto-pagine hanno `SubScreenHeader`, con un cerchio bianco con la freccia indietro e il titolo centrato a 17/600.
+- **Colori:** neutri freddi. Il fondo è grigio chiaro `#F1F1F4`, le superfici sono bianche, `surfaceMuted` è `#E9E9EE` e il testo `#111111`. In scuro il fondo è `#101214` e le superfici `#1B1E21`. Il colore del brand c'è uno solo (in Paniere è verde) e si usa per bottoni, badge e spunte.
+- **Card:** bianche, senza bordo, raggio 18 e ombra leggera (opacità 0,05, raggio 8). Gli elementi flottanti (la barra in basso, la ricerca) hanno un'ombra più forte (0,12, raggio 16).
+- **Righe:** `SettingsRow`, con un'icona outline da 22, il titolo a 16 pt, il valore in grigio, la freccia e divisori sottili. Le scelte singole mostrano un cerchio vuoto o un cerchio con la spunta, del colore del brand.
+- **Etichette di sezione:** 12 pt, peso 600, MAIUSCOLE e grigie.
+- **Profilo:** si apre con una card che contiene l'avatar a iniziali e il nome, poi vengono le sezioni Account (nome, lingua, aspetto), Info (versione) e Legale (termini, privacy).
+- **Icone:** Hugeicons (`@hugeicons/core-free-icons`, stile Stroke Rounded), tutte scelte in `constants/icons.ts`. Sono le stesse su iOS e su Android.
+- **Font:** quello di sistema. Gli stili dipendono dal tema e si scrivono con `makeStyles()`.
+
 ## Cosa fare adesso
 
-1. **Studiare Paniere.** Annotare in questo file cosa usa per:
-   - la barra di navigazione in basso (nativa o personalizzata, flottante o no, icone, etichette, indicatore);
-   - colori e tipografia (font, dimensioni, pesi);
-   - card, liste e righe, raggi degli angoli, ombre;
-   - le intestazioni delle schermate;
-   - la schermata profilo (struttura, sezioni, righe);
-   - librerie e componenti condivisi che si possono riprendere.
-2. **Rifare la UI di Fitness con lo stesso stile,** tenendo l'arancione come colore del brand. Si parte dalla barra di navigazione in basso, poi lista esercizi, dettaglio e profilo.
-3. **Mostrare a Valerio gli screenshot affiancati** di Paniere e Fitness prima di chiudere il lavoro.
+1. ~~Studiare Paniere~~ (fatto: vedi «Lo stile di Paniere»).
+2. ~~Rifare la UI di Fitness con lo stesso stile~~ (fatto il 30 ottobre 2026, provata nell'anteprima web).
+3. **Farla vedere a Valerio** sul telefono, accanto a Paniere, e correggere quello che non lo convince.
 4. **Supabase:**
    - applicare le migrazioni (`npx supabase db push`);
    - aggiungere un `ExerciseRepository` che legge da Supabase (con `@supabase/supabase-js` e le variabili di `.env`) e usarlo al posto di quello locale;
@@ -152,7 +160,7 @@ Deciso con Valerio il 30 ottobre 2026:
 - **Lingua:** Valerio scrive in italiano, quindi si risponde in italiano. Il codice e i commenti nel codice sono in inglese; README e documenti in `docs/` sono in italiano.
 - **Fine lavoro:** a ogni lavoro concluso, commit e push.
 - **Prima di consegnare:** `npm run lint`, `npm run typecheck`, `npm run format`. Il typecheck richiede di aver lanciato `npx expo start` almeno una volta, perché genera i tipi delle route. Le convenzioni del codice sono in `AGENTS.md`.
-- **Verifica visiva:** nella sessione cloud si faceva con l'export web (`npx expo export --platform web`) e screenshot con Playwright, ma l'anteprima web **non** rappresenta la tab bar nativa. Sul computer locale conviene provare su simulatore iOS o con Expo Go.
+- **Verifica visiva:** nella sessione cloud si faceva con l'export web (`npx expo export --platform web`) e screenshot con Playwright, ora la barra in basso è la stessa anche sul web, quindi l'anteprima (`.claude/launch.json`, configurazione `web`) è fedele. Resta da provare su iPhone con Expo Go (ombre e safe area).
 - **Documentazione Expo:** `docs.expo.dev` non era raggiungibile dalla sessione cloud, quindi le API sono state verificate sui tipi in `node_modules`. In locale conviene consultare la documentazione dell'SDK 58, come indica `AGENTS.md`.
 
 ## Cronologia
@@ -170,6 +178,7 @@ Deciso con Valerio il 30 ottobre 2026:
    Claude concorda e propone la tabella unica per le schede. Valerio chiede di caricare per ora solo 2 esercizi e vuole dare l'accesso a Expo. Viene scritta e provata in locale la migrazione `exercises`; la sessione cloud non raggiunge né Supabase né Paniere.
 
 6. **Expo.** Valerio fa il login con Supabase e aggiunge la repo di Paniere in locale (`../paniere-mobile-app`). Si crea il progetto Expo `@maestrale-lab/fitness` e si aggiunge `eas.json`; App Store Connect si rimanda alla prima pubblicazione.
+7. **UI come Paniere.** Si studia Paniere (vedi «Lo stile di Paniere») e si rifà la UI di Fitness: barra a pillola flottante con tab JavaScript, niente header nativi, card bianche, righe in stile impostazioni, icone Hugeicons, neutri freddi con l'arancione come unico colore del brand. Provata nell'anteprima web, in chiaro e in scuro.
 
 ### Richiesta iniziale (testo integrale)
 

@@ -1,51 +1,65 @@
-import { ScrollView, StyleSheet } from 'react-native';
+import { ScrollView } from 'react-native';
 
-import { ListRow, ListSection } from '@/components/list';
-import { MaxContentWidth, Spacing } from '@/constants/theme';
-import { useTheme } from '@/hooks/use-theme';
+import { Card } from '@/components/card';
+import type { IconData } from '@/components/icon';
+import { Screen } from '@/components/screen';
+import { SettingsRow } from '@/components/settings-row';
+import { SubScreenHeader } from '@/components/sub-screen-header';
+import { ThemedText } from '@/components/themed-text';
+import { Spacing } from '@/constants/theme';
+import { makeStyles } from '@/hooks/use-styles';
 
 type OptionListScreenProps<T extends string> = {
-  options: { value: T; label: string }[];
+  title: string;
+  options: { value: T; label: string; icon?: IconData }[];
   selected: T;
   onSelect: (value: T) => void;
   footer?: string;
 };
 
-/** A single-choice settings screen: a list of options with a checkmark on the selected one. */
+/** A single-choice settings page: a card of options with a check circle on the selected one. */
 export function OptionListScreen<T extends string>({
+  title,
   options,
   selected,
   onSelect,
   footer,
 }: OptionListScreenProps<T>) {
-  const theme = useTheme();
+  const styles = useStyles();
 
   return (
-    <ScrollView
-      contentInsetAdjustmentBehavior="automatic"
-      style={{ backgroundColor: theme.background }}
-      contentContainerStyle={styles.content}>
-      <ListSection footer={footer}>
-        {options.map((option) => (
-          <ListRow
-            key={option.value}
-            title={option.label}
-            accessory="check"
-            accessibilityRole="radio"
-            selected={option.value === selected}
-            onPress={() => onSelect(option.value)}
-          />
-        ))}
-      </ListSection>
-    </ScrollView>
+    <Screen withBottomInset>
+      <SubScreenHeader title={title} />
+      <ScrollView contentContainerStyle={styles.content}>
+        <Card>
+          {options.map((option, index) => (
+            <SettingsRow
+              key={option.value}
+              icon={option.icon}
+              label={option.label}
+              selected={option.value === selected}
+              onPress={() => onSelect(option.value)}
+              last={index === options.length - 1}
+            />
+          ))}
+        </Card>
+        {footer ? (
+          <ThemedText type="subhead" themeColor="textSecondary" style={styles.footer}>
+            {footer}
+          </ThemedText>
+        ) : null}
+      </ScrollView>
+    </Screen>
   );
 }
 
-const styles = StyleSheet.create({
+const useStyles = makeStyles(() => ({
   content: {
-    width: '100%',
-    maxWidth: MaxContentWidth,
-    alignSelf: 'center',
-    padding: Spacing.four,
+    gap: Spacing.two,
+    paddingTop: Spacing.four,
+    paddingBottom: Spacing.six,
   },
-});
+  footer: {
+    paddingHorizontal: Spacing.one,
+  },
+}));

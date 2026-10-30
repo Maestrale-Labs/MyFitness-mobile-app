@@ -47,7 +47,8 @@ Fitness app, iOS first, Android later from the same code. Start from `docs/memor
 - Screens live in `src/app/`; feature code (types, data, hooks, feature components) in `src/features/<feature>/`; shared UI in `src/components/`.
 - Colors only from `useTheme()` (`src/constants/theme.ts`). Use `tint` for accent text, icons and selected fills (with `onTint` on top); `brand` is decorative. Keep new color pairs at WCAG AA contrast in both schemes.
 - Every user-facing string goes through i18next (`useTranslation`). Add keys to `src/i18n/locales/it.ts` first; `en.ts` is typed against it. Localized content (exercise names, steps, legal texts) uses `Localized<T>` and `useLocale()`.
-- Icons: `Icon` from `@/components/icon`, with an SF Symbol for iOS and a Material Symbol for Android.
+- Icons: Hugeicons, as in Paniere. Pick them in `src/constants/icons.ts` and render them with `Icon` from `@/components/icon`.
+- UI follows Paniere (`../paniere-mobile-app`): no native headers, the floating pill tab bar (`floating-tab-bar.tsx`), `Screen`, `Card`, `SettingsRow`, `SectionLabel`, `SubScreenHeader`. Write theme-dependent styles with `makeStyles()` (`src/hooks/use-styles.ts`); tab screens pad their scroll content with `useTabBarInset()`.
 - Exercises are read through `ExerciseRepository` + React Query (`src/features/exercises/queries.ts`), never from the seed file directly, so the Supabase switch stays local to the repository.
 - Inside `<Link asChild>`, don't pass a style function to `Pressable` (it is dropped on web); style an inner `View` from the `pressed` render prop instead.
 - Before declaring work done: `npm run lint`, `npm run typecheck`, `npm run format`.

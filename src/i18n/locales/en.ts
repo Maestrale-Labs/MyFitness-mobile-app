@@ -1,6 +1,9 @@
 import type { Translations } from './it';
 
 export const en: Translations = {
+  common: {
+    back: 'Back',
+  },
   tabs: {
     exercises: 'Exercises',
     profile: 'Profile',
@@ -23,6 +26,7 @@ export const en: Translations = {
     secondaryMuscles: 'Secondary muscles',
     equipment: 'Equipment',
     bodyPart: 'Body part',
+    details: 'Details',
     howTo: 'How to do it',
     mediaCredit: 'Animation © {{credit}}',
   },
@@ -31,6 +35,7 @@ export const en: Translations = {
     namePlaceholderTitle: 'Add your name',
     sectionPreferences: 'Preferences',
     sectionInfo: 'About',
+    sectionLegal: 'Legal',
     name: 'Name',
     nameInputPlaceholder: 'What’s your name?',
     nameFooter: 'Your name is only stored on this device.',

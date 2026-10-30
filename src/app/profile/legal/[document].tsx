@@ -1,16 +1,18 @@
-import { Stack, useLocalSearchParams } from 'expo-router';
+import { useLocalSearchParams } from 'expo-router';
 import { useTranslation } from 'react-i18next';
-import { ScrollView, StyleSheet, View } from 'react-native';
+import { ScrollView, View } from 'react-native';
 
+import { Screen } from '@/components/screen';
+import { SubScreenHeader } from '@/components/sub-screen-header';
 import { ThemedText } from '@/components/themed-text';
-import { MaxContentWidth, Radius, Spacing } from '@/constants/theme';
+import { Radius, Spacing } from '@/constants/theme';
 import { isLegalDocumentId, legalDocuments } from '@/features/legal/documents';
-import { useTheme } from '@/hooks/use-theme';
+import { makeStyles } from '@/hooks/use-styles';
 import { useLocale } from '@/i18n';
 
 export default function LegalDocumentScreen() {
   const { document } = useLocalSearchParams<{ document: string }>();
-  const theme = useTheme();
+  const styles = useStyles();
   const locale = useLocale();
   const { t } = useTranslation();
 
@@ -19,52 +21,53 @@ export default function LegalDocumentScreen() {
   }
 
   const { updatedAt, sections } = legalDocuments[document];
-  const title = t(`profile.${document}`);
   const date = new Intl.DateTimeFormat(locale, { dateStyle: 'long' }).format(new Date(updatedAt));
 
   return (
-    <ScrollView
-      contentInsetAdjustmentBehavior="automatic"
-      style={{ backgroundColor: theme.background }}
-      contentContainerStyle={styles.content}>
-      <Stack.Screen options={{ title }} />
-
-      <View style={[styles.notice, { backgroundColor: theme.brandSoft }]}>
-        <ThemedText type="footnote" themeColor="tint">
-          {t('legal.draftNotice')}
-        </ThemedText>
-      </View>
-
-      {sections.map((section) => (
-        <View key={section.heading.en} style={styles.section}>
-          <ThemedText type="headline" accessibilityRole="header">
-            {section.heading[locale]}
+    <Screen withBottomInset>
+      <SubScreenHeader title={t(`profile.${document}`)} />
+      <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.content}>
+        <View style={styles.notice}>
+          <ThemedText type="footnote" themeColor="tint">
+            {t('legal.draftNotice')}
           </ThemedText>
-          <ThemedText themeColor="textSecondary">{section.body[locale]}</ThemedText>
         </View>
-      ))}
 
-      <ThemedText type="footnote" themeColor="textSecondary">
-        {t('legal.lastUpdated', { date })}
-      </ThemedText>
-    </ScrollView>
+        {sections.map((section) => (
+          <View key={section.heading.en} style={styles.section}>
+            <ThemedText type="headline" accessibilityRole="header">
+              {section.heading[locale]}
+            </ThemedText>
+            <ThemedText type="callout" themeColor="textSecondary" style={styles.paragraph}>
+              {section.body[locale]}
+            </ThemedText>
+          </View>
+        ))}
+
+        <ThemedText type="footnote" themeColor="textSecondary">
+          {t('legal.lastUpdated', { date })}
+        </ThemedText>
+      </ScrollView>
+    </Screen>
   );
 }
 
-const styles = StyleSheet.create({
+const useStyles = makeStyles((theme) => ({
   content: {
-    width: '100%',
-    maxWidth: MaxContentWidth,
-    alignSelf: 'center',
     gap: Spacing.five,
-    padding: Spacing.four,
-    paddingBottom: Spacing.seven,
+    paddingTop: Spacing.two,
+    paddingHorizontal: Spacing.one,
+    paddingBottom: Spacing.six,
   },
   notice: {
     padding: Spacing.three,
     borderRadius: Radius.medium,
+    backgroundColor: theme.brandSoft,
   },
   section: {
     gap: Spacing.two,
   },
-});
+  paragraph: {
+    lineHeight: 22,
+  },
+}));

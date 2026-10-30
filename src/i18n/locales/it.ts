@@ -1,5 +1,8 @@
 // Italian is the reference locale: other locales must provide the same keys.
 export const it = {
+  common: {
+    back: 'Indietro',
+  },
   tabs: {
     exercises: 'Esercizi',
     profile: 'Profilo',
@@ -22,6 +25,7 @@ export const it = {
     secondaryMuscles: 'Muscoli secondari',
     equipment: 'Attrezzatura',
     bodyPart: 'Zona',
+    details: 'Dettagli',
     howTo: 'Esecuzione',
     mediaCredit: 'Animazione © {{credit}}',
   },
@@ -30,6 +34,7 @@ export const it = {
     namePlaceholderTitle: 'Aggiungi il tuo nome',
     sectionPreferences: 'Preferenze',
     sectionInfo: 'Informazioni',
+    sectionLegal: 'Legale',
     name: 'Nome',
     nameInputPlaceholder: 'Come ti chiami?',
     nameFooter: 'Il nome resta salvato solo su questo dispositivo.',
