@@ -42,7 +42,7 @@ Docs: https://docs.expo.dev/eas/index.md
 
 ## This project
 
-Fitness app, iOS first, Android later from the same code. See `README.md` (Italian) and `docs/exercise-data.md`.
+Fitness app, iOS first, Android later from the same code. Start from `docs/memoria-progetto.md` (Italian): product brief, decisions so far, open questions and the next step. Keep it updated when a decision changes. See also `README.md` and `docs/exercise-data.md`.
 
 - Screens live in `src/app/`; feature code (types, data, hooks, feature components) in `src/features/<feature>/`; shared UI in `src/components/`.
 - Colors only from `useTheme()` (`src/constants/theme.ts`). Use `tint` for accent text, icons and selected fills (with `onTint` on top); `brand` is decorative. Keep new color pairs at WCAG AA contrast in both schemes.

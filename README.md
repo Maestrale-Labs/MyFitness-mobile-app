@@ -7,6 +7,8 @@ Per ora ci sono due sezioni:
 - **Esercizi**: lista con ricerca e filtro per zona del corpo; il dettaglio mostra l'animazione, i muscoli coinvolti e i passaggi dell'esecuzione. Al momento ci sono 2 esercizi di prova (lat machine e panca piana).
 - **Profilo**: nome, tema (automatico / chiaro / scuro), lingua (automatica / italiano / inglese), termini e condizioni, privacy policy, versione.
 
+Decisioni, stato del lavoro e prossimi passi sono in [docs/memoria-progetto.md](docs/memoria-progetto.md).
+
 Non c'è ancora un backend: i dati degli esercizi sono nel codice e le preferenze restano sul dispositivo. Vedi [docs/exercise-data.md](docs/exercise-data.md) per da dove vengono gli esercizi e come passeremo a Supabase.
 
 ## Avviarla
