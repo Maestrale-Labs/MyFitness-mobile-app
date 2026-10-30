@@ -53,12 +53,33 @@ type Exercise = {
 
 Zone del corpo, attrezzature e muscoli sono chiavi delle traduzioni (`bodyPart.*`, `equipment.*`, `muscle.*` in `src/i18n/locales/`): se un esercizio usa un valore senza traduzione, TypeScript dà errore. Le zone e le attrezzature del dataset ci sono già tutte; i muscoli secondari del dataset sono poco uniformi (`traps` e `trapezius`, `delts` e `shoulders`...) e vanno normalizzati durante l'import.
 
-## Passare a Supabase
+## Su Supabase
 
-Le schermate non leggono `seed.ts` direttamente ma passano da `ExerciseRepository` (`src/features/exercises/repository.ts`), con React Query sopra. Quando avremo il progetto Supabase:
+La tabella è definita nelle migrazioni in `supabase/migrations/`:
 
-1. tabella `exercises` con le colonne del modello qui sopra (i testi localizzati come `jsonb` o colonne `name_it`/`name_en`);
-2. uno script che importa il dataset (mappando e normalizzando i valori) e carica i media su Supabase Storage;
-3. una seconda implementazione di `ExerciseRepository` che legge da Supabase, da sostituire a quella locale.
+- `20261030130000_create_exercises.sql` crea `public.exercises`, con le stesse informazioni del modello qui sopra:
+  - i testi localizzati (`name`, `steps`) sono `jsonb` nel formato `{"it": …, "en": …}`;
+  - zone, attrezzature e muscoli sono le chiavi delle traduzioni;
+  - c'è un vincolo unico sulla fonte (`source_dataset` + `source_id`).
+- **Regole di accesso (RLS)**: chiunque può leggere, anche senza account; nessuno può scrivere con le chiavi dell'app. Si scrive solo con le migrazioni o con la chiave *service role*.
+- `20261030130100_add_sample_exercises.sql` inserisce i 2 esercizi di prova. Sta in una migrazione e non in `seed.sql` perché il catalogo deve esserci anche in produzione, e `seed.sql` gira solo in locale.
 
-Le schede di allenamento e il diario dei progressi saranno tabelle legate all'utente, quindi serviranno anche l'autenticazione e le regole di accesso (RLS). Il catalogo degli esercizi invece può restare pubblico in sola lettura.
+Le migrazioni sono state provate su un Postgres 16 con i ruoli `anon` e `authenticated` di Supabase:
+- la lettura funziona e restituisce dati identici a `seed.ts`;
+- inserimenti, modifiche e cancellazioni dall'app vengono rifiutati;
+- i vincoli bloccano nomi senza una lingua, slug non validi e duplicati della fonte.
+
+**Applicarle al progetto** (dal computer, con la CLI collegata):
+
+```bash
+npx supabase login
+npx supabase link --project-ref xkczxrhdligtguxcoitq
+npx supabase db push
+```
+
+### Ancora da fare
+
+1. L'app legge ancora da `seed.ts`. Una volta applicate le migrazioni, si aggiunge un `ExerciseRepository` che legge da Supabase e si sostituisce a quello locale; poi `seed.ts` si può cancellare.
+2. Per l'import completo serve uno script che mappa e normalizza i valori del dataset. Caricare i media su Supabase Storage è possibile solo con la licenza delle animazioni (vedi sopra).
+
+Schede di allenamento e diario saranno tabelle legate all'utente, con autenticazione e RLS. Il catalogo degli esercizi resta pubblico in sola lettura.

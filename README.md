@@ -9,7 +9,7 @@ Per ora ci sono due sezioni:
 
 Decisioni, stato del lavoro e prossimi passi sono in [docs/memoria-progetto.md](docs/memoria-progetto.md).
 
-Non c'è ancora un backend: i dati degli esercizi sono nel codice e le preferenze restano sul dispositivo. Vedi [docs/exercise-data.md](docs/exercise-data.md) per da dove vengono gli esercizi e come passeremo a Supabase.
+Il backend sarà Supabase. La tabella degli esercizi è pronta come migrazione in `supabase/migrations/`, ma per ora l'app legge ancora gli esercizi dal codice e le preferenze restano sul dispositivo. Vedi [docs/exercise-data.md](docs/exercise-data.md) per da dove vengono gli esercizi e come si applicano le migrazioni.
 
 ## Avviarla
 

@@ -8,9 +8,15 @@ Ultimo aggiornamento: 30 ottobre 2026.
 
 - La base dell'app c'è: tab **Esercizi** (lista, ricerca, filtro, dettaglio con GIF) e tab **Profilo** (nome, tema, lingua, termini, privacy, versione). Il primo commit è `986624b` sul branch `claude/tender-archimedes-lr4kab`.
 - Valerio ha visto il risultato e **la UI non lo convince ancora**: va rifatta prendendo lo stile da **Paniere**, a partire dalla **barra di navigazione in basso**, che non va bene.
-- Paniere non era raggiungibile dalla sessione cloud in cui è nata l'app (vedi «Paniere» più sotto). Il lavoro riprende dal computer di Valerio, che ha accesso a tutti i repository.
+- Paniere non era raggiungibile dalla sessione cloud in cui è nata l'app (vedi «Paniere» più sotto). Valerio sta per collegarlo.
+- La tabella Supabase degli esercizi è pronta come migrazione in `supabase/migrations/` (con i 2 esercizi di prova) ed è stata provata su un Postgres locale. **Non è ancora applicata al progetto**, e l'app legge ancora gli esercizi dal codice.
+- Il repository GitHub è stato rinominato da `Maestrale-Labs/Fitness` a `Maestrale-Labs/MyFitness-mobile-app`.
 
-**Prossimo passo:** aprire il codice di Paniere, studiarne lo stile e rifare la UI di Fitness allo stesso modo. I dettagli sono in «Cosa fare adesso».
+**Prossimi passi** (si parte da quello che si sblocca prima):
+- studiare Paniere e rifare la UI di Fitness nello stesso stile;
+- applicare le migrazioni a Supabase e far leggere gli esercizi all'app da lì.
+
+I dettagli sono in «Cosa fare adesso».
 
 ## Il prodotto
 
@@ -42,6 +48,40 @@ Riassunto della richiesta iniziale di Valerio (il testo integrale è in fondo):
 - **Chiavi nell'app:** `.env` contiene solo `EXPO_PUBLIC_SUPABASE_URL` e `EXPO_PUBLIC_SUPABASE_KEY` (la chiave *publishable*, fatta apposta per stare nel client). È nel repository, così le build EAS la trovano.
 - **Cosa non va mai nel repository** (che è pubblico) né nell'app: la chiave *service role*, la password del database e il token personale `sbp_…`. Si tengono fuori dal codice e si passano alla CLI da terminale.
 - **CLI:** `supabase/` è stato creato con `supabase init`. Per il collegamento (`supabase link --project-ref xkczxrhdligtguxcoitq`) serve un login con l'account che possiede il progetto, perché quello che era già collegato sul computer (organizzazione di Paniere e Hommy) non ha accesso.
+- **Tabelle:** si definiscono solo come migrazioni in `supabase/migrations/` e si applicano con `npx supabase db push`. La prima è `public.exercises`, il catalogo pubblico:
+  - lettura per tutti, anche senza account;
+  - nessuna scrittura con le chiavi dell'app;
+  - solo 2 esercizi per ora, perché Valerio vuole vedere come vengono prima di caricarne altri.
+
+  Dettagli in `docs/exercise-data.md`.
+- **Dalla sessione cloud** Supabase non era raggiungibile: la rete bloccava `*.supabase.co` e `api.supabase.com`, e non c'erano credenziali fra le variabili d'ambiente. Le chiavi incollate nella sessione sul computer non passano alla sessione cloud. Per lavorarci dal cloud servono:
+  - i due domini nella lista dei domini consentiti delle impostazioni di rete dell'ambiente;
+  - un token come variabile d'ambiente segreta, da non scrivere mai in chat o nel repository.
+
+  In alternativa le migrazioni si applicano dal computer.
+
+### Account e uso senza registrazione
+
+Deciso con Valerio il 30 ottobre 2026:
+
+- **L'app si usa senza registrarsi.** Senza account si vedono gli esercizi e si possono seguire le schede preimpostate.
+- **L'account serve solo per salvare dati propri:** schede personalizzate, record, pesi, recuperi, progressi.
+- **Si parte dalle basi.** Il profilo resta al minimo indispensabile; schede personalizzate e diario (peso sollevato, recupero) vengono dopo.
+- **Proposta per le schede, non ancora confermata:** una sola struttura di tabelle per le schede nostre e per quelle personali. Una scheda senza proprietario (`owner_id` vuoto) è nostra e la vedono tutti; con proprietario è privata. Così le schede preimpostate funzionano senza account e «copia nelle mie schede» è semplice.
+- **Regole Apple da rispettare quando arrivano gli account:**
+  - non chiedere il login per funzioni che non ne hanno bisogno;
+  - permettere di cancellare l'account dall'app;
+  - se si offre il login con Google o simili, offrire anche «Accedi con Apple».
+- **Più avanti, se serve:** Supabase permette utenti anonimi convertibili in account veri, utile per far registrare un allenamento prima dell'iscrizione senza perderlo. Per ora non si usa.
+
+### Expo
+
+- Per provare l'app sul telefono **non serve un account Expo**: basta `npx expo start` sul computer e l'app Expo Go sull'iPhone.
+- L'account Expo (EAS) serve per le build vere: development build, TestFlight, App Store. Valerio vuole creare l'account e dare l'accesso.
+- Dalla sessione cloud `expo.dev` e `api.expo.dev` erano bloccati. Per lanciare build da lì servono:
+  - quei domini nella lista dei domini consentiti;
+  - un `EXPO_TOKEN` come variabile segreta dell'ambiente.
+- La prima build iOS conviene farla dal computer, perché EAS chiede il login Apple Developer.
 
 ### Il dataset degli esercizi
 
@@ -76,19 +116,25 @@ Riassunto della richiesta iniziale di Valerio (il testo integrale è in fondo):
    - librerie e componenti condivisi che si possono riprendere.
 2. **Rifare la UI di Fitness con lo stesso stile,** tenendo l'arancione come colore del brand. Si parte dalla barra di navigazione in basso, poi lista esercizi, dettaglio e profilo.
 3. **Mostrare a Valerio gli screenshot affiancati** di Paniere e Fitness prima di chiudere il lavoro.
-4. Poi, nell'ordine:
-   - schede di allenamento;
-   - aggiunta di esercizi a una scheda;
-   - diario giornaliero e progressi;
-   - import completo del catalogo;
-   - Supabase.
+4. **Supabase:**
+   - applicare le migrazioni (`npx supabase db push`);
+   - aggiungere un `ExerciseRepository` che legge da Supabase (con `@supabase/supabase-js` e le variabili di `.env`) e usarlo al posto di quello locale;
+   - verificare sul telefono.
+5. Poi, nell'ordine:
+   - schede preimpostate, senza account;
+   - account;
+   - schede personalizzate e aggiunta di esercizi a una scheda;
+   - diario giornaliero, pesi, recuperi e record;
+   - import completo del catalogo.
 
 ## Domande ancora aperte
 
 - **Nome dell'app:** per ora è «Fitness». Icona e splash sono ancora quelli del template Expo.
 - **Animazioni:** licenza Gym visual, oppure un'altra fonte per le immagini?
 - **Testi legali** definitivi e URL della privacy policy.
-- **Progetto Supabase:** creato, ma ancora da collegare alla CLI e da usare nell'app (vedi «Supabase»).
+- **Progetto Supabase:** creato, con le migrazioni del catalogo pronte; ancora da collegare alla CLI, applicare e usare nell'app (vedi «Supabase»).
+- **Struttura delle schede:** confermare la proposta della tabella unica per schede nostre e personali (vedi «Account e uso senza registrazione»).
+- **Account Expo:** da creare, per le build EAS.
 
 ## Come si lavora su questo progetto
 
@@ -104,6 +150,13 @@ Riassunto della richiesta iniziale di Valerio (il testo integrale è in fondo):
 2. **Feedback.** «Come UI ancora non ci siamo… se ti guardi come abbiamo fatto Paniere puoi molto migliorare l'applicazione… la bottom navigation non va bene». Valerio sceglie di dare accesso al repo di Paniere e vuole la barra in basso come quella di Paniere. Il repo non era però collegabile dalla sessione cloud.
 3. **Passaggio al computer locale.** Valerio chiede di salvare in questo file tutto quello che ci si è detti, per riprendere la chat dal suo computer con accesso a tutti i repository.
 4. **Supabase.** Dal computer locale si verifica che commit e push funzionano. Valerio fornisce il progetto Supabase: URL e chiave pubblica vanno in `.env` e viene creata la cartella `supabase/`. Il collegamento della CLI resta da fare.
+5. **Piano e prime tabelle** (di nuovo nella sessione cloud). Valerio propone:
+   - esercizi in una tabella pubblica;
+   - schede personalizzate solo con account, più avanti;
+   - pesi e recuperi più avanti;
+   - app usabile senza registrazione, con schede preimpostate; registrazione per salvare record e progressi.
+
+   Claude concorda e propone la tabella unica per le schede. Valerio chiede di caricare per ora solo 2 esercizi e vuole dare l'accesso a Expo. Viene scritta e provata in locale la migrazione `exercises`; la sessione cloud non raggiunge né Supabase né Paniere.
 
 ### Richiesta iniziale (testo integrale)
 
