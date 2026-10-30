@@ -49,6 +49,12 @@
     "experiments": {
       "typedRoutes": true,
       "reactCompiler": true
+    },
+    "owner": "maestrale-lab",
+    "extra": {
+      "eas": {
+        "projectId": "241313c9-8c78-4737-9433-4503049e33cc"
+      }
     }
   }
 }

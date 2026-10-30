@@ -8,11 +8,13 @@ Ultimo aggiornamento: 30 ottobre 2026.
 
 - La base dell'app c'è: tab **Esercizi** (lista, ricerca, filtro, dettaglio con GIF) e tab **Profilo** (nome, tema, lingua, termini, privacy, versione). Il primo commit è `986624b` sul branch `claude/tender-archimedes-lr4kab`.
 - Valerio ha visto il risultato e **la UI non lo convince ancora**: va rifatta prendendo lo stile da **Paniere**, a partire dalla **barra di navigazione in basso**, che non va bene.
-- Paniere non era raggiungibile dalla sessione cloud in cui è nata l'app (vedi «Paniere» più sotto). Valerio sta per collegarlo.
+- Paniere non era raggiungibile dalla sessione cloud in cui è nata l'app (vedi «Paniere» più sotto). Ora è in locale in `../paniere-mobile-app`.
+- L'app è collegata al progetto Expo `@maestrale-lab/fitness` e ha il suo `eas.json` (vedi «Expo, EAS e App Store»).
 - La tabella Supabase degli esercizi è pronta come migrazione in `supabase/migrations/` (con i 2 esercizi di prova) ed è stata provata su un Postgres locale. **Non è ancora applicata al progetto**, e l'app legge ancora gli esercizi dal codice.
 - Il repository GitHub è stato rinominato da `Maestrale-Labs/Fitness` a `Maestrale-Labs/MyFitness-mobile-app`.
 
 **Prossimi passi** (si parte da quello che si sblocca prima):
+
 - studiare Paniere e rifare la UI di Fitness nello stesso stile;
 - applicare le migrazioni a Supabase e far leggere gli esercizi all'app da lì.
 
@@ -45,8 +47,8 @@ Riassunto della richiesta iniziale di Valerio (il testo integrale è in fondo):
 ### Supabase
 
 - **Il progetto c'è** (30 ottobre 2026): ref `xkczxrhdligtguxcoitq`, URL `https://xkczxrhdligtguxcoitq.supabase.co`. L'app non lo usa ancora: gli esercizi sono nel codice e le preferenze restano sul telefono. Servirà con le schede personalizzate e il diario, cioè quando servono account, dati legati all'utente (con regole RLS) e sincronizzazione. Il catalogo degli esercizi potrà essere pubblico in sola lettura. Il piano completo è in `docs/exercise-data.md`.
-- **Chiavi nell'app:** `.env` contiene solo `EXPO_PUBLIC_SUPABASE_URL` e `EXPO_PUBLIC_SUPABASE_KEY` (la chiave *publishable*, fatta apposta per stare nel client). È nel repository, così le build EAS la trovano.
-- **Cosa non va mai nel repository** (che è pubblico) né nell'app: la chiave *service role*, la password del database e il token personale `sbp_…`. Si tengono fuori dal codice e si passano alla CLI da terminale.
+- **Chiavi nell'app:** `.env` contiene solo `EXPO_PUBLIC_SUPABASE_URL` e `EXPO_PUBLIC_SUPABASE_KEY` (la chiave _publishable_, fatta apposta per stare nel client). È nel repository, così le build EAS la trovano.
+- **Cosa non va mai nel repository** (che è pubblico) né nell'app: la chiave _service role_, la password del database e il token personale `sbp_…`. Si tengono fuori dal codice e si passano alla CLI da terminale.
 - **CLI:** `supabase/` è stato creato con `supabase init`. Per il collegamento (`supabase link --project-ref xkczxrhdligtguxcoitq`) serve un login con l'account che possiede il progetto, perché quello che era già collegato sul computer (organizzazione di Paniere e Hommy) non ha accesso.
 - **Tabelle:** si definiscono solo come migrazioni in `supabase/migrations/` e si applicano con `npx supabase db push`. La prima è `public.exercises`, il catalogo pubblico:
   - lettura per tutti, anche senza account;
@@ -54,6 +56,7 @@ Riassunto della richiesta iniziale di Valerio (il testo integrale è in fondo):
   - solo 2 esercizi per ora, perché Valerio vuole vedere come vengono prima di caricarne altri.
 
   Dettagli in `docs/exercise-data.md`.
+
 - **Dalla sessione cloud** Supabase non era raggiungibile: la rete bloccava `*.supabase.co` e `api.supabase.com`, e non c'erano credenziali fra le variabili d'ambiente. Le chiavi incollate nella sessione sul computer non passano alla sessione cloud. Per lavorarci dal cloud servono:
   - i due domini nella lista dei domini consentiti delle impostazioni di rete dell'ambiente;
   - un token come variabile d'ambiente segreta, da non scrivere mai in chat o nel repository.
@@ -83,6 +86,14 @@ Deciso con Valerio il 30 ottobre 2026:
   - un `EXPO_TOKEN` come variabile segreta dell'ambiente.
 - La prima build iOS conviene farla dal computer, perché EAS chiede il login Apple Developer.
 
+### Expo, EAS e App Store
+
+- **Progetto Expo:** `@maestrale-lab/fitness` (ID `241313c9-8c78-4737-9433-4503049e33cc`), sotto l'organizzazione `maestrale-lab` come Paniere: https://expo.dev/accounts/maestrale-lab/projects/fitness.
+- **`eas.json`:** stessi profili di Paniere (`development`, `preview`, `production`), con il numero di build gestito da EAS. Il profilo `development` richiede `expo-dev-client`, che non è ancora installato: si aggiunge quando serve la prima development build.
+- **Sviluppo:** per ora basta Expo Go sull'iPhone, perché tutte le dipendenze sono incluse in Expo Go.
+- **App Store Connect:** non serve ancora. L'Apple Developer Program c'è già (quello di Paniere). L'app su App Store Connect si crea al primo `eas submit`, che può farlo da solo, e solo allora si aggiunge `ascAppId` in `eas.json`. Prima va scelto il nome definitivo, perché «Fitness» è il nome dell'app di Apple.
+- **Bundle ID:** `com.maestralelabs.fitness`, sia iOS che Android.
+
 ### Il dataset degli esercizi
 
 - Fonte scelta: [hasaneyldrm/exercises-dataset](https://github.com/hasaneyldrm/exercises-dataset), con 1.324 esercizi, GIF, istruzioni in 10 lingue (italiano compreso) e licenza MIT per dati e testi.
@@ -103,7 +114,7 @@ Deciso con Valerio il 30 ottobre 2026:
 - **Cos'è:** l'app di riferimento per lo stile. Va studiata prima di qualunque altro lavoro sulla UI.
 - **Cosa è stato cercato:** nella sessione cloud non era accessibile. Non è tra i repository collegati e `Maestrale-Labs/Paniere` e `foddai0/paniere` non esistono o non sono accessibili. Non compare cercando sul web e sull'App Store, e non è citata nel repo `foddai0/valeriofoddai.com`.
 - **Cosa non è:** `foddai0/panormus` è un gioco in Godot (un open world a Palermo), non c'entra.
-- **Come procedere:** dal computer di Valerio, cercare il repo di Paniere tra quelli locali o su GitHub. Se non si trova, chiedere a Valerio dove sta.
+- **Dove sta:** sul computer di Valerio, in `../paniere-mobile-app` accanto a questo progetto (progetto Expo `@maestrale-lab/paniere`).
 
 ## Cosa fare adesso
 
@@ -129,7 +140,7 @@ Deciso con Valerio il 30 ottobre 2026:
 
 ## Domande ancora aperte
 
-- **Nome dell'app:** per ora è «Fitness». Icona e splash sono ancora quelli del template Expo.
+- **Nome dell'app:** per ora resta «Fitness» (decisione di Valerio). Si rivede prima di andare live e di creare l'app su App Store Connect, anche perché «Fitness» è il nome dell'app di Apple. Se cambia, basta toccare `name` in `app.json`; slug, bundle ID e progetto Expo sono identificativi interni e possono restare. Icona e splash sono ancora quelli del template Expo.
 - **Animazioni:** licenza Gym visual, oppure un'altra fonte per le immagini?
 - **Testi legali** definitivi e URL della privacy policy.
 - **Progetto Supabase:** creato, con le migrazioni del catalogo pronte; ancora da collegare alla CLI, applicare e usare nell'app (vedi «Supabase»).
@@ -157,6 +168,8 @@ Deciso con Valerio il 30 ottobre 2026:
    - app usabile senza registrazione, con schede preimpostate; registrazione per salvare record e progressi.
 
    Claude concorda e propone la tabella unica per le schede. Valerio chiede di caricare per ora solo 2 esercizi e vuole dare l'accesso a Expo. Viene scritta e provata in locale la migrazione `exercises`; la sessione cloud non raggiunge né Supabase né Paniere.
+
+6. **Expo.** Valerio fa il login con Supabase e aggiunge la repo di Paniere in locale (`../paniere-mobile-app`). Si crea il progetto Expo `@maestrale-lab/fitness` e si aggiunge `eas.json`; App Store Connect si rimanda alla prima pubblicazione.
 
 ### Richiesta iniziale (testo integrale)
 
