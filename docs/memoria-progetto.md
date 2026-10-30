@@ -7,7 +7,7 @@ Ultimo aggiornamento: 30 ottobre 2026.
 ## Dove siamo arrivati
 
 - La base dell'app c'è: tab **Esercizi** (lista, ricerca, filtro, dettaglio con GIF) e tab **Profilo** (nome, tema, lingua, termini, privacy, versione). Il primo commit è `986624b` sul branch `claude/tender-archimedes-lr4kab`.
-- C'è una terza tab, **Allenamenti** («I miei allenamenti»), che è la prima della barra e quella che si apre all'avvio, con le prime 2 schede preimpostate per principianti (vedi «Schede di allenamento»). Per ora si consultano e basta: non si salva ancora nulla.
+- C'è una terza tab, **Schede** (prima si chiamava «Allenamenti», con il titolo «I miei allenamenti»), che è la prima della barra e quella che si apre all'avvio, con le prime 2 schede preimpostate per principianti (vedi «Schede di allenamento»). Per ora si consultano e basta: non si salva ancora nulla.
 - Valerio ha visto il primo risultato e la UI non lo convinceva, a partire dalla barra di navigazione in basso. **La UI è stata rifatta con lo stile di Paniere** (30 ottobre 2026): barra a pillola flottante, card bianche, righe in stile impostazioni, icone Hugeicons. Va ancora vista da Valerio su un telefono.
 - Paniere non era raggiungibile dalla sessione cloud in cui è nata l'app (vedi «Paniere» più sotto). Ora è in locale in `../paniere-mobile-app`.
 - L'app è collegata al progetto Expo `@maestrale-lab/fitness` e ha il suo `eas.json` (vedi «Expo, EAS e App Store»).
@@ -110,7 +110,7 @@ Deciso con Valerio il 30 ottobre 2026:
 
 Decise il 30 ottobre 2026:
 
-- **Dove stanno:** nella tab **Allenamenti**, la prima della barra (Allenamenti · Esercizi · Profilo) e quella che si apre all'avvio, come ha chiesto Valerio, con il titolo «I miei allenamenti». In alto ci sono le «Schede consigliate», cioè quelle fornite da noi; sotto c'è «Le tue schede», per ora solo un messaggio che annuncia le schede personalizzate.
+- **Dove stanno:** nella tab **Schede**, la prima della barra (Schede · Esercizi · Profilo) e quella che si apre all'avvio, come ha chiesto Valerio. Prima si chiamava «Allenamenti» (titolo «I miei allenamenti»), ma Valerio l'ha rinominata perché lì ci sono le schede. In alto ci sono le «Schede consigliate», cioè quelle fornite da noi; sotto c'è «Le tue schede», per ora solo un messaggio che annuncia le schede personalizzate.
 - **Le prime 2 schede,** tutte e due con obiettivo **aumento muscolare** e livello **principiante**, di 8 settimane:
   - **Full body principiante:** 3 giorni a settimana; il giorno 3 è uguale al giorno 1. Pochi esercizi, soprattutto macchine e manubri.
   - **Upper/Lower principiante:** 4 giorni a settimana (giorni 1 e 3 per la parte alta, 2 e 4 per la parte bassa). È il passo successivo dopo qualche mese di full body.
@@ -199,6 +199,7 @@ Decise il 30 ottobre 2026:
 8. **Animazioni e più esercizi.** Le GIF del dataset vanno a scatti. Un prototipo di animazione nostra viene scartato da Valerio, quindi si tengono le GIF originali. Si caricano 30 esercizi, 5 o 6 per gruppo (schiena, gambe, glutei, bicipiti, petto), con i nomi e i testi italiani scritti a mano, e la lista si filtra per gruppo muscolare.
 9. **Schede.** Valerio chiede le prime schede, per l'aumento muscolare e di livello principiante, in una nuova sezione della navigazione («My Workout, qualcosa di questo genere»). Si aggiunge la tab **Allenamenti** con 2 schede, Full body (3 giorni) e Upper/Lower (4 giorni). Si caricano i 6 esercizi che mancavano, per un totale di 36.
 10. **Allenamenti per primi e schede a giorni.** Valerio chiede di mettere Allenamenti come prima sezione e di dividere le schede per giorni (Giorno 1, 2, 3) invece che in allenamento A e B, «pazienza se giorno 1 è uguale al giorno 3».
+11. **«Schede».** Valerio fa rinominare la sezione «I miei allenamenti» in «Schede», perché lì ci sono le schede. Chiede anche se si può già «aggiungere una scheda al proprio percorso» e vederla in una home, o se serve prima il login.
 
 ### Richiesta iniziale (testo integrale)
 

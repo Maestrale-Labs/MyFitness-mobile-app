@@ -5,7 +5,7 @@ export const it = {
   },
   tabs: {
     exercises: 'Esercizi',
-    workouts: 'Allenamenti',
+    workouts: 'Schede',
     profile: 'Profilo',
   },
   exercises: {
@@ -31,7 +31,7 @@ export const it = {
     mediaCredit: 'Animazione © {{credit}}',
   },
   workouts: {
-    title: 'I miei allenamenti',
+    title: 'Schede',
     sectionSuggested: 'Schede consigliate',
     sectionMine: 'Le tue schede',
     mineEmpty: 'Presto potrai creare le tue schede con gli esercizi della libreria.',

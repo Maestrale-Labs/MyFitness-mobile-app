@@ -6,7 +6,7 @@ export const en: Translations = {
   },
   tabs: {
     exercises: 'Exercises',
-    workouts: 'Workouts',
+    workouts: 'Plans',
     profile: 'Profile',
   },
   exercises: {
@@ -32,7 +32,7 @@ export const en: Translations = {
     mediaCredit: 'Animation © {{credit}}',
   },
   workouts: {
-    title: 'My workouts',
+    title: 'Workout plans',
     sectionSuggested: 'Suggested plans',
     sectionMine: 'Your plans',
     mineEmpty: 'Soon you’ll be able to build your own plans from the exercise library.',
