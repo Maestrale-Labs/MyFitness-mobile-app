@@ -11,8 +11,8 @@ Ultimo aggiornamento: 30 ottobre 2026.
 - Valerio ha visto il primo risultato e la UI non lo convinceva, a partire dalla barra di navigazione in basso. **La UI è stata rifatta con lo stile di Paniere** (30 ottobre 2026): barra a pillola flottante, card bianche, righe in stile impostazioni, icone Hugeicons. Va ancora vista da Valerio su un telefono.
 - Paniere non era raggiungibile dalla sessione cloud in cui è nata l'app (vedi «Paniere» più sotto). Ora è in locale in `../paniere-mobile-app`.
 - L'app è collegata al progetto Expo `@maestrale-lab/fitness` e ha il suo `eas.json` (vedi «Expo, EAS e App Store»).
-- La tabella Supabase degli esercizi è pronta come migrazione in `supabase/migrations/` (con i 2 esercizi di prova) ed è stata provata su un Postgres locale. **Non è ancora applicata al progetto**, e l'app legge ancora gli esercizi dal codice. Ora nel codice gli esercizi sono 36 e c'è il campo nuovo `muscleGroup`: prima di applicare le migrazioni vanno aggiornate tutte e due le cose.
-- Ci sono le **statistiche anonime d'uso** (installazioni, utenti attivi, ritorni, eventi), inviate a Supabase senza account: vedi «Statistiche anonime» e `docs/analytics.md`. La migrazione `analytics` è scritta ma **va ancora applicata** (`npx supabase db push --linked`); finché non lo è, gli eventi restano in coda sul telefono.
+- La tabella Supabase degli esercizi (`public.exercises`, con i 2 esercizi di prova) è **applicata al progetto** dal 30 ottobre 2026, ma l'app legge ancora gli esercizi dal codice. Nel codice gli esercizi sono 36 e c'è il campo `muscleGroup`: prima di far leggere il catalogo da Supabase serve una nuova migrazione che aggiunga la colonna e gli altri esercizi.
+- Ci sono le **statistiche anonime d'uso** (installazioni, utenti attivi, ritorni, eventi), inviate a Supabase senza account: vedi «Statistiche anonime» e `docs/analytics.md`. La migrazione `analytics` è **applicata** (30 ottobre 2026) e il primo evento di prova è arrivato.
 - Il repository GitHub è stato rinominato da `Maestrale-Labs/Fitness` a `Maestrale-Labs/MyFitness-mobile-app`.
 
 **Prossimi passi** (si parte da quello che si sblocca prima):
