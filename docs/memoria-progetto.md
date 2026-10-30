@@ -177,6 +177,7 @@ Decise il 30 ottobre 2026:
 - **Fine lavoro:** a ogni lavoro concluso, commit e push.
 - **Prima di consegnare:** `npm run lint`, `npm run typecheck`, `npm run format`. Il typecheck richiede di aver lanciato `npx expo start` almeno una volta, perché genera i tipi delle route. Le convenzioni del codice sono in `AGENTS.md`.
 - **Verifica visiva:** nella sessione cloud si faceva con l'export web (`npx expo export --platform web`) e screenshot con Playwright, ora la barra in basso è la stessa anche sul web, quindi l'anteprima (`.claude/launch.json`, configurazione `web`) è fedele. Resta da provare su iPhone con Expo Go (ombre e safe area).
+- **Server Expo che resta indietro:** il progetto sta in OneDrive e, dopo ore di lavoro, Metro può smettere di vedere le modifiche (nel log compare `EMFILE: too many open files`). Succede soprattutto quando si rinominano o spostano file. Il telefono allora riceve una versione vecchia dell'app: il 30 ottobre 2026 le tab Allenamenti ed Esercizi mostravano tutte e due gli esercizi. Dopo aver rinominato file, o se l'app non riflette le modifiche, conviene riavviare con `npx expo start --clear` e ricaricare Expo Go.
 - **Documentazione Expo:** `docs.expo.dev` non era raggiungibile dalla sessione cloud, quindi le API sono state verificate sui tipi in `node_modules`. In locale conviene consultare la documentazione dell'SDK 58, come indica `AGENTS.md`.
 
 ## Cronologia
