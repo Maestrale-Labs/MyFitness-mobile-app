@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "Fitness",
+    "name": "MaestraleGym",
     "slug": "fitness",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -9,11 +9,11 @@
     "userInterfaceStyle": "automatic",
     "ios": {
       "icon": "./assets/expo.icon",
-      "bundleIdentifier": "com.maestralelabs.fitness",
+      "bundleIdentifier": "com.maestralelabs.maestralegym",
       "supportsTablet": false
     },
     "android": {
-      "package": "com.maestralelabs.fitness",
+      "package": "com.maestralelabs.maestralegym",
       "adaptiveIcon": {
         "backgroundColor": "#E8622C",
         "foregroundImage": "./assets/images/android-icon-foreground.png",

@@ -1,6 +1,6 @@
 # Memoria del progetto
 
-Questo file raccoglie tutto quello che è stato deciso finora su Fitness, perché chi riprende il lavoro (una persona o Claude in una nuova sessione) parta da qui senza dover rileggere le chat. Va aggiornato a ogni decisione importante.
+Questo file raccoglie tutto quello che è stato deciso finora su MaestraleGym (prima «Fitness»), perché chi riprende il lavoro (una persona o Claude in una nuova sessione) parta da qui senza dover rileggere le chat. Va aggiornato a ogni decisione importante.
 
 Ultimo aggiornamento: 30 ottobre 2026.
 
@@ -110,8 +110,8 @@ Deciso con Valerio il 30 ottobre 2026:
 - **Progetto Expo:** `@maestrale-lab/fitness` (ID `241313c9-8c78-4737-9433-4503049e33cc`), sotto l'organizzazione `maestrale-lab` come Paniere: https://expo.dev/accounts/maestrale-lab/projects/fitness.
 - **`eas.json`:** stessi profili di Paniere (`development`, `preview`, `production`), con il numero di build gestito da EAS. Il profilo `development` richiede `expo-dev-client`, che non è ancora installato: si aggiunge quando serve la prima development build.
 - **Sviluppo:** per ora basta Expo Go sull'iPhone, perché tutte le dipendenze sono incluse in Expo Go.
-- **App Store Connect:** non serve ancora. L'Apple Developer Program c'è già (quello di Paniere). L'app su App Store Connect si crea al primo `eas submit`, che può farlo da solo, e solo allora si aggiunge `ascAppId` in `eas.json`. Prima va scelto il nome definitivo, perché «Fitness» è il nome dell'app di Apple.
-- **Bundle ID:** `com.maestralelabs.fitness`, sia iOS che Android.
+- **App Store Connect:** il 31 ottobre 2026 Valerio registra l'App ID `com.maestralelabs.maestralegym` (team `537737V753`) con le capability **Push Notifications** e **Sign In with Apple**, e crea l'app «MaestraleGym» su App Store Connect (SKU `maestralegym`). Quando c'è il suo Apple ID numerico va messo in `eas.json` come `ascAppId`.
+- **Bundle ID:** `com.maestralelabs.maestralegym`, sia iOS che Android (prima era `com.maestralelabs.fitness`, mai pubblicato).
 
 ### Il dataset degli esercizi
 
@@ -180,7 +180,7 @@ Decise il 30 ottobre 2026:
 
 ## Domande ancora aperte
 
-- **Nome dell'app:** per ora resta «Fitness» (decisione di Valerio). Si rivede prima di andare live e di creare l'app su App Store Connect, anche perché «Fitness» è il nome dell'app di Apple. Se cambia, basta toccare `name` in `app.json`; slug, bundle ID e progetto Expo sono identificativi interni e possono restare. Icona e splash sono ancora quelli del template Expo.
+- **Nome dell'app:** deciso il 31 ottobre 2026: **MaestraleGym** (`name` in `app.json`). «MyFitnessApp» era già usato sull'App Store. Slug (`fitness`), progetto Expo e repository restano con i nomi di prima: sono identificativi interni. Icona e splash sono ancora quelli del template Expo.
 - **Animazioni:** per ora si tengono le **GIF originali** del dataset. Vanno a scatti già all'origine (il lat pulldown ha 12 fotogrammi a 180×180 px, con pause di 1 s), e ricalcarle o interpolarle senza licenza non si può. Il 30 ottobre 2026 è stato provato un prototipo nostro (una figura SVG animata in codice), ma a Valerio non è piaciuto («terribile») ed è stato tolto. Resta aperta la licenza Gym visual prima del rilascio.
 - **Testi legali** definitivi e URL della privacy policy.
 - **Progetto Supabase:** creato, con le migrazioni del catalogo pronte; ancora da collegare alla CLI, applicare e usare nell'app (vedi «Supabase»).
@@ -218,6 +218,7 @@ Decise il 30 ottobre 2026:
 11. **«Schede».** Valerio fa rinominare la sezione «I miei allenamenti» in «Schede», perché lì ci sono le schede. Chiede anche se si può già «aggiungere una scheda al proprio percorso» e vederla in una home, o se serve prima il login.
 12. **Statistiche anonime.** Valerio vuole sapere quante persone usano l'app senza obbligarle a registrarsi. Si decide: percorso salvato sul telefono, e un contatore anonimo su Supabase con installazioni, utenti attivi, ritorni ed eventi. Si collega la CLI di Supabase, si scrive la migrazione `analytics`, si aggiungono il tracciamento nell'app, l'interruttore nel profilo e i testi in privacy e termini.
 13. **Feedback.** Valerio chiede di poter ricevere feedback anche da chi non è registrato. Si aggiunge la pagina «Invia un feedback» nel profilo, con categoria e minimo 10 caratteri, senza limiti di invio, e la tabella `public.feedbacks` su Supabase (applicata e provata).
+14. **Nome: MaestraleGym.** «MyFitnessApp» è già preso sull'App Store; Valerio sceglie «MaestraleGym», registra l'App ID `com.maestralelabs.maestralegym` con notifiche push e Sign In with Apple, e crea l'app su App Store Connect.
 
 ### Richiesta iniziale (testo integrale)
 

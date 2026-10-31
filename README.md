@@ -1,4 +1,4 @@
-# Fitness
+# MaestraleGym
 
 App di allenamento per iOS (prima) e Android, fatta con **Expo** (React Native). Un solo codice per entrambe le piattaforme: niente cartelle `ios/` e `android/` scritte a mano, le genera Expo.
 
