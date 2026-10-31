@@ -1,8 +1,9 @@
-import { useLocalSearchParams } from 'expo-router';
+import { router, useLocalSearchParams } from 'expo-router';
 import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ActivityIndicator, ScrollView, StyleSheet, Text, View } from 'react-native';
 
+import { Button } from '@/components/button';
 import { Card } from '@/components/card';
 import { Chip } from '@/components/chip';
 import { Icon } from '@/components/icon';
@@ -14,12 +15,15 @@ import { icons } from '@/constants/icons';
 import { Spacing } from '@/constants/theme';
 import { track } from '@/features/analytics/client';
 import { useExercises } from '@/features/exercises/queries';
+import { useTraining } from '@/features/training/store';
 import { PlanExerciseRow } from '@/features/workouts/components/plan-exercise-row';
 import { PlanTags } from '@/features/workouts/components/plan-tags';
-import { useWorkoutPlan } from '@/features/workouts/queries';
+import { useWorkoutPlan, useWorkoutPlans } from '@/features/workouts/queries';
+import type { WorkoutPlan } from '@/features/workouts/types';
 import { makeStyles } from '@/hooks/use-styles';
 import { useTheme } from '@/hooks/use-theme';
 import { useLocale } from '@/i18n';
+import { confirm } from '@/utils/confirm';
 
 export default function WorkoutPlanScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -92,6 +96,8 @@ export default function WorkoutPlanScreen() {
           </View>
         </Card>
 
+        <PlanAction plan={plan} />
+
         <SectionLabel>{t('plan.schedule')}</SectionLabel>
         <Card>
           <Text style={styles.paragraph}>{plan.schedule[locale]}</Text>
@@ -143,7 +149,67 @@ export default function WorkoutPlanScreen() {
   );
 }
 
+/** Start following the plan, or stop if it's the one being followed. */
+function PlanAction({ plan }: { plan: WorkoutPlan }) {
+  const styles = useStyles();
+  const locale = useLocale();
+  const { t } = useTranslation();
+  const activePlanId = useTraining((state) => state.activePlan?.planId);
+  const assignPlan = useTraining((state) => state.assignPlan);
+  const leavePlan = useTraining((state) => state.leavePlan);
+  const { data: plans = [] } = useWorkoutPlans();
+
+  async function start() {
+    const currentPlan = plans.find((item) => item.id === activePlanId);
+    if (
+      currentPlan &&
+      !(await confirm({
+        title: t('plan.replaceTitle'),
+        message: t('plan.replaceMessage', { name: currentPlan.name[locale] }),
+        confirmLabel: t('plan.replaceConfirm'),
+        cancelLabel: t('common.cancel'),
+      }))
+    ) {
+      return;
+    }
+    assignPlan(plan);
+    router.navigate('/');
+  }
+
+  async function leave() {
+    const confirmed = await confirm({
+      title: t('plan.leaveTitle'),
+      message: t('plan.leaveMessage'),
+      confirmLabel: t('plan.leaveConfirm'),
+      cancelLabel: t('common.cancel'),
+      destructive: true,
+    });
+    if (confirmed) {
+      leavePlan();
+    }
+  }
+
+  if (activePlanId === plan.id) {
+    return (
+      <View style={styles.action}>
+        <ThemedText type="subhead" themeColor="tint" style={styles.following}>
+          {t('plan.following')}
+        </ThemedText>
+        <Button variant="plain" label={t('plan.leave')} onPress={leave} />
+      </View>
+    );
+  }
+  return <Button icon={icons.start} label={t('plan.start')} onPress={start} />;
+}
+
 const useStyles = makeStyles((theme) => ({
+  action: {
+    alignItems: 'center',
+    gap: Spacing.one,
+  },
+  following: {
+    fontWeight: 600,
+  },
   loader: {
     marginTop: Spacing.six,
   },

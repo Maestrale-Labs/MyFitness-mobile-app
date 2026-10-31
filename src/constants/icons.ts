@@ -2,11 +2,14 @@
 // Stroke Rounded style, as in Paniere. Icons are picked here only, so swapping one
 // never touches the screens.
 import {
+  ArrowDataTransferHorizontalIcon,
   ArrowLeft01Icon,
   ArrowRight01Icon,
+  Award01Icon,
   BodyPartMuscleIcon,
   Bug01Icon,
   Calendar03Icon,
+  Cancel01Icon,
   CancelCircleIcon,
   ChartLineData01Icon,
   CheckmarkCircle02Icon,
@@ -15,31 +18,38 @@ import {
   Dumbbell01Icon,
   File01Icon,
   Globe02Icon,
+  Home01Icon,
   Idea01Icon,
   InformationCircleIcon,
   Message01Icon,
   MoreHorizontalCircle01Icon,
   Moon02Icon,
+  NextIcon,
   PencilEdit02Icon,
+  PlayIcon,
+  PlusSignIcon,
   Search01Icon,
   Shield01Icon,
-  SparklesIcon,
   SmartPhone01Icon,
+  SparklesIcon,
   Sun03Icon,
   Target02Icon,
   TaskDaily01Icon,
+  Tick02Icon,
+  Timer01Icon,
   UserIcon,
   WorkoutRunIcon,
 } from '@hugeicons/core-free-icons';
 
 export const icons = {
   // tab bar
+  tabHome: Home01Icon,
   tabExercises: Dumbbell01Icon,
-  tabWorkouts: TaskDaily01Icon,
   tabProfile: UserIcon,
   // navigation
   back: ArrowLeft01Icon,
   chevronRight: ArrowRight01Icon,
+  close: Cancel01Icon,
   // choices
   checked: CheckmarkCircle02Icon,
   unchecked: CircleIcon,
@@ -56,6 +66,14 @@ export const icons = {
   daysPerWeek: Calendar03Icon,
   duration: Clock01Icon,
   tips: Idea01Icon,
+  // training
+  start: PlayIcon,
+  setDone: Tick02Icon,
+  addSet: PlusSignIcon,
+  swap: ArrowDataTransferHorizontalIcon,
+  skip: NextIcon,
+  rest: Timer01Icon,
+  completed: Award01Icon,
   // profile
   user: UserIcon,
   name: PencilEdit02Icon,

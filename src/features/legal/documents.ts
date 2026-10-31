@@ -62,8 +62,8 @@ export const legalDocuments: Record<LegalDocumentId, LegalDocument> = {
       {
         heading: { it: 'Dati salvati sul dispositivo', en: 'Data stored on your device' },
         body: {
-          it: 'Il nome che inserisci e le preferenze di tema e lingua restano salvati solo sul tuo dispositivo e non vengono inviati a nessun server.',
-          en: 'The name you enter and your theme and language preferences are stored only on your device and are not sent to any server.',
+          it: 'Il nome che inserisci, le preferenze di tema e lingua e i tuoi allenamenti (la scheda che segui, i pesi e le ripetizioni) restano salvati solo sul tuo dispositivo e non vengono inviati a nessun server.',
+          en: 'The name you enter, your theme and language preferences and your workouts (the plan you follow, weights and reps) are stored only on your device and are not sent to any server.',
         },
       },
       {

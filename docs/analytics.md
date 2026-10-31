@@ -22,8 +22,10 @@ L'app conta installazioni, utenti attivi e ritorni, e registra alcuni eventi d'u
 | `app_open` | apertura dell'app o ritorno in primo piano | — |
 | `plan_viewed` | apertura del dettaglio di una scheda | `planId` |
 | `exercise_viewed` | apertura del dettaglio di un esercizio | `exerciseId` |
-
-In arrivo con il percorso: `plan_added`, `workout_completed`, `plan_completed`.
+| `plan_added` | «Inizia questa scheda» | `planId`, `level` |
+| `workout_started` | inizio di un allenamento | `planId`, `day` |
+| `workout_completed` | allenamento terminato (con almeno una serie) | `planId`, `day`, `exercisesDone`, `exercisesSkipped` |
+| `plan_completed` | fatti tutti gli allenamenti della scheda | `planId`, `level` |
 
 ## Su Supabase
 

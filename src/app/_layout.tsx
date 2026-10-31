@@ -7,6 +7,7 @@ import { useEffect } from 'react';
 import { Colors, type ColorScheme } from '@/constants/theme';
 import { useAnalyticsLifecycle } from '@/features/analytics/use-analytics-lifecycle';
 import { useSettingsHydrated } from '@/features/settings/store';
+import { useTrainingHydrated } from '@/features/training/store';
 import { useApplyColorSchemePreference, useColorScheme } from '@/hooks/use-color-scheme';
 import { useSyncLanguagePreference } from '@/i18n';
 
@@ -32,7 +33,9 @@ function navigationTheme(scheme: ColorScheme): Theme {
 }
 
 export default function RootLayout() {
-  const hydrated = useSettingsHydrated();
+  const settingsHydrated = useSettingsHydrated();
+  const trainingHydrated = useTrainingHydrated();
+  const hydrated = settingsHydrated && trainingHydrated;
   const scheme = useColorScheme();
 
   useApplyColorSchemePreference();
@@ -45,7 +48,8 @@ export default function RootLayout() {
     }
   }, [hydrated]);
 
-  // Keep the splash screen up until saved theme and language are known, to avoid a flash.
+  // Keep the splash screen up until saved preferences and training are known, to avoid a
+  // flash of the wrong theme or of an empty Home.
   if (!hydrated) {
     return null;
   }
@@ -64,6 +68,10 @@ export default function RootLayout() {
           <Stack.Screen name="(tabs)" />
           <Stack.Screen name="exercises/[id]" />
           <Stack.Screen name="workouts/[id]" />
+          <Stack.Screen
+            name="workout"
+            options={{ presentation: 'fullScreenModal', gestureEnabled: false }}
+          />
           <Stack.Screen name="profile/name" />
           <Stack.Screen name="profile/theme" />
           <Stack.Screen name="profile/language" />

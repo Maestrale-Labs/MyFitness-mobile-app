@@ -6,14 +6,14 @@ import { makeStyles } from '@/hooks/use-styles';
 
 import type { WorkoutPlan } from '../types';
 
-/** Goal and level of a plan, as orange pills. */
+/** Level and goal of a plan, as orange pills. */
 export function PlanTags({ plan }: { plan: WorkoutPlan }) {
   const styles = useStyles();
   const { t } = useTranslation();
 
   return (
     <View style={styles.tags}>
-      {[t(`planGoal.${plan.goal}`), t(`planLevel.${plan.level}`)].map((label) => (
+      {[t('plan.level', { number: plan.level }), t(`planGoal.${plan.goal}`)].map((label) => (
         <View key={label} style={styles.tag}>
           <Text style={styles.tagText}>{label}</Text>
         </View>

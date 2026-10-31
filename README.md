@@ -4,8 +4,8 @@ App di allenamento per iOS (prima) e Android, fatta con **Expo** (React Native).
 
 Per ora ci sono tre sezioni:
 
-- **Schede** (la prima sezione): le schede fornite da noi, per ora 2 per principianti (Full body e Upper/Lower), divise per giorni, con serie, ripetizioni e recuperi.
-- **Esercizi**: lista con ricerca e filtro per gruppo muscolare (schiena, gambe, glutei, bicipiti, petto, spalle, tricipiti, addome); il dettaglio mostra l'animazione, i muscoli coinvolti e i passaggi dell'esecuzione. Al momento ci sono 36 esercizi.
+- **Home**: il percorso. Si sceglie una scheda (livello 1, 2…) e da qui si avvia l'allenamento: un esercizio alla volta, segnando kg e ripetizioni di ogni serie, con il recupero cronometrato. Il peso riparte da quello dell'ultima volta. Tutto è salvato sul telefono.
+- **Esercizi**: due viste. **Schede**: quelle fornite da noi, in ordine di livello (per ora Full body e Upper/Lower). **Esercizi**: lista con ricerca e filtro per gruppo muscolare (schiena, gambe, glutei, bicipiti, petto, spalle, tricipiti, addome); il dettaglio mostra l'animazione, i muscoli coinvolti e i passaggi dell'esecuzione. Al momento ci sono 36 esercizi.
 - **Profilo**: nome, tema (automatico / chiaro / scuro), lingua (automatica / italiano / inglese), termini e condizioni, privacy policy, versione.
 
 Decisioni, stato del lavoro e prossimi passi sono in [docs/memoria-progetto.md](docs/memoria-progetto.md).

@@ -6,14 +6,16 @@ import type { WorkoutPlan } from './types';
  * `ExerciseRepository`, so the plans can move to Supabase without touching them.
  */
 export type WorkoutPlanRepository = {
+  /** Sorted by level. */
   list(): Promise<WorkoutPlan[]>;
   getById(id: string): Promise<WorkoutPlan | null>;
 };
 
 function createLocalWorkoutPlanRepository(plans: WorkoutPlan[]): WorkoutPlanRepository {
+  const byLevel = [...plans].sort((a, b) => a.level - b.level);
   return {
     async list() {
-      return plans;
+      return byLevel;
     },
     async getById(id) {
       return plans.find((plan) => plan.id === id) ?? null;

@@ -7,7 +7,7 @@ Ultimo aggiornamento: 30 ottobre 2026.
 ## Dove siamo arrivati
 
 - La base dell'app c'è: tab **Esercizi** (lista, ricerca, filtro, dettaglio con GIF) e tab **Profilo** (nome, tema, lingua, termini, privacy, versione). Il primo commit è `986624b` sul branch `claude/tender-archimedes-lr4kab`.
-- C'è una terza tab, **Schede** (prima si chiamava «Allenamenti», con il titolo «I miei allenamenti»), che è la prima della barra e quella che si apre all'avvio, con le prime 2 schede preimpostate per principianti (vedi «Schede di allenamento»). Per ora si consultano e basta: non si salva ancora nulla.
+- Dal 31 ottobre 2026 la barra è **Home · Esercizi · Profilo**. La Home mostra il percorso: la scheda che stai seguendo, a che punto sei e il prossimo allenamento. La tab Esercizi ha due viste, **Schede** (la prima) ed **Esercizi**. Le schede sono livelli (1, 2…): si sceglie una scheda, la si assegna e ci si allena dalla Home un esercizio alla volta, segnando pesi e ripetizioni. Tutto è salvato sul telefono. Vedi «Percorso e allenamento».
 - Valerio ha visto il primo risultato e la UI non lo convinceva, a partire dalla barra di navigazione in basso. **La UI è stata rifatta con lo stile di Paniere** (30 ottobre 2026): barra a pillola flottante, card bianche, righe in stile impostazioni, icone Hugeicons. Va ancora vista da Valerio su un telefono.
 - Paniere non era raggiungibile dalla sessione cloud in cui è nata l'app (vedi «Paniere» più sotto). Ora è in locale in `../paniere-mobile-app`.
 - L'app è collegata al progetto Expo `@maestrale-lab/maestralegym` e ha il suo `eas.json` (vedi «Expo, EAS e App Store»).
@@ -124,17 +124,40 @@ Deciso con Valerio il 30 ottobre 2026:
 
 ### Schede di allenamento
 
-Decise il 30 ottobre 2026:
+Decise il 30 ottobre 2026, riviste il 31:
 
-- **Dove stanno:** nella tab **Schede**, la prima della barra (Schede · Esercizi · Profilo) e quella che si apre all'avvio, come ha chiesto Valerio. Prima si chiamava «Allenamenti» (titolo «I miei allenamenti»), ma Valerio l'ha rinominata perché lì ci sono le schede. In alto ci sono le «Schede consigliate», cioè quelle fornite da noi; sotto c'è «Le tue schede», per ora solo un messaggio che annuncia le schede personalizzate.
-- **Le prime 2 schede,** tutte e due con obiettivo **aumento muscolare** e livello **principiante**, di 8 settimane:
-  - **Full body principiante:** 3 giorni a settimana; il giorno 3 è uguale al giorno 1. Pochi esercizi, soprattutto macchine e manubri.
-  - **Upper/Lower principiante:** 4 giorni a settimana (giorni 1 e 3 per la parte alta, 2 e 4 per la parte bassa). È il passo successivo dopo qualche mese di full body.
+- **Dove stanno:** nella tab **Esercizi**, vista **Schede** (la prima che si vede). Prima avevano una tab tutta loro (prima «Allenamenti», poi «Schede»). In alto c'è una riga che invita a partire dal livello 1, poi le schede in ordine di livello; sotto c'è «Le tue schede», per ora solo un messaggio che annuncia le schede personalizzate.
+- **Le schede sono livelli** (decisione di Valerio): si parte dal **livello 1**, la più semplice, e si sale. Nella lista ogni scheda mostra solo il livello, il nome, i giorni a settimana e le settimane: la descrizione completa sta nella pagina della scheda.
+- **Le prime 2 schede,** tutte e due con obiettivo **aumento muscolare**, di 8 settimane:
+  - **Livello 1, Full body:** 3 giorni a settimana; il giorno 3 è uguale al giorno 1. Pochi esercizi, soprattutto macchine e manubri.
+  - **Livello 2, Upper/Lower:** 4 giorni a settimana (giorni 1 e 3 per la parte alta, 2 e 4 per la parte bassa).
+  - I livelli successivi (3, 4…) e i contenuti definitivi delle schede sono da decidere con Valerio.
 - **Le schede sono divise per giorni** (Giorno 1, Giorno 2, Giorno 3…) e non per allenamenti A/B: così chi la segue sa cosa fare in ogni giorno della settimana, anche se due giorni sono uguali. Decisione di Valerio.
 - **Cosa c'è in una scheda:** descrizione, giorni a settimana, durata, come organizzare la settimana, gli allenamenti (con serie, ripetizioni e recupero di ogni esercizio) e alcuni consigli generali (riscaldamento, scelta del peso, progressione). Dalla scheda si apre il dettaglio di ogni esercizio.
-- **Codice:** `src/features/workouts/` ha i tipi (`WorkoutPlan`, `WorkoutDay`, `PlanExercise`), i dati in `data/plans.ts` e un `WorkoutPlanRepository` letto con React Query, come per gli esercizi, così anche le schede potranno passare a Supabase. Le schermate sono `src/app/(tabs)/index.tsx` (la tab Allenamenti) e `src/app/workouts/[id].tsx`; la tab Esercizi è `src/app/(tabs)/exercises.tsx`. Una scheda fa riferimento agli esercizi tramite il loro `id`.
+- **Codice:** `src/features/workouts/` ha i tipi (`WorkoutPlan`, `WorkoutDay`, `PlanExercise`), i dati in `data/plans.ts` e un `WorkoutPlanRepository` letto con React Query, come per gli esercizi, così anche le schede potranno passare a Supabase. La lista è `src/features/workouts/components/plan-list.tsx`, mostrata dalla tab Esercizi (`src/app/(tabs)/exercises.tsx`, vista `?view=plans`); la pagina di una scheda è `src/app/workouts/[id].tsx`. Una scheda fa riferimento agli esercizi tramite il loro `id`.
 - **Esercizi aggiunti per le schede:** 6 (vedi «Il dataset degli esercizi»), con 3 gruppi muscolari nuovi: Spalle, Tricipiti e Addome.
-- **Non c'è ancora:** salvare una scheda, segnare le serie fatte e i pesi, lo storico. Arrivano con il diario.
+- Il livello è il campo `level` (un numero); `WorkoutPlanRepository.list()` restituisce le schede già ordinate.
+
+### Percorso e allenamento
+
+Deciso con Valerio il 31 ottobre 2026. Tutto resta **sul telefono** (zustand con AsyncStorage, `src/features/training/store.ts`) finché non ci sono gli account; lo splash aspetta che i dati siano letti.
+
+- **Scegliere una scheda:** dalla pagina di una scheda, «Inizia questa scheda». Se se ne segue già un'altra, l'app chiede conferma; gli allenamenti fatti restano salvati. Dalla stessa pagina si può smettere di seguirla.
+- **Home:**
+  - senza scheda: «Non hai ancora iniziato un percorso» e il bottone «Scegli una scheda», che apre la vista Schede;
+  - con una scheda: livello e nome, una barra di avanzamento («Settimana 2 di 8», «4 di 24 allenamenti»), il prossimo allenamento (Giorno N, muscoli, numero di esercizi) con «Inizia allenamento» o «Riprendi allenamento», e gli ultimi 3 allenamenti fatti;
+  - a scheda finita: «Scheda completata!», con «Passa al livello N+1» e «Ripeti la scheda».
+- **Durata e avanzamento:** una scheda vale *giorni a settimana × settimane* allenamenti (24 per il livello 1). L'avanzamento conta gli allenamenti fatti, non i giorni del calendario: se salti una settimana non perdi niente. I giorni si susseguono (1, 2, 3, poi di nuovo 1).
+- **Allenamento** (`src/app/workout.tsx`, a schermo intero):
+  - un esercizio alla volta, con animazione, obiettivo («3 × 10–12 · recupero 90 s») e quello che hai fatto l'ultima volta;
+  - per ogni serie si scrivono **kg** e **ripetizioni** e si spunta. Il peso parte da quello dell'ultima volta; spuntata una serie, il suo peso passa alle serie successive ancora vuote. Una serie spuntata senza ripetizioni conta il minimo dell'obiettivo;
+  - dopo ogni serie parte il **recupero** con il conto alla rovescia (si può saltare);
+  - se l'ultima volta hai fatto tutte le ripetizioni in ogni serie, l'app suggerisce di aumentare il peso: è la **progressione**;
+  - si può **cambiare** esercizio (con un altro dello stesso gruppo muscolare), **saltarlo**, aggiungere serie, saltare da un esercizio all'altro con la barra in alto;
+  - «Termina» salva e mostra il riepilogo (esercizi, serie, kg sollevati). Un allenamento senza nessuna serie spuntata non viene salvato e non conta;
+  - se esci a metà resta in pausa e si riprende dalla Home, anche dopo aver chiuso l'app.
+- **Statistiche:** `plan_added`, `workout_started`, `workout_completed`, `plan_completed` (vedi `docs/analytics.md`).
+- **Da fare:** storico dei pesi per esercizio (grafico dei progressi), diario, livelli successivi, promemoria con le notifiche.
 
 ### Profilo
 
@@ -172,10 +195,11 @@ Decise il 30 ottobre 2026:
    - aggiungere un `ExerciseRepository` che legge da Supabase (con `@supabase/supabase-js` e le variabili di `.env`) e usarlo al posto di quello locale;
    - verificare sul telefono.
 5. Poi, nell'ordine:
-   - ~~schede preimpostate, senza account~~ (le prime 2 ci sono dal 30 ottobre 2026, da vedere sul telefono);
+   - ~~schede preimpostate, senza account~~ (le prime 2 ci sono dal 30 ottobre 2026);
+   - ~~scegliere una scheda e allenarsi segnando i pesi~~ (31 ottobre 2026, da provare sul telefono);
    - account;
    - schede personalizzate e aggiunta di esercizi a una scheda;
-   - diario giornaliero, pesi, recuperi e record;
+   - diario e progressi: storico dei pesi per esercizio, record;
    - import completo del catalogo.
 
 ## Domande ancora aperte
@@ -220,6 +244,7 @@ Decise il 30 ottobre 2026:
 13. **Feedback.** Valerio chiede di poter ricevere feedback anche da chi non è registrato. Si aggiunge la pagina «Invia un feedback» nel profilo, con categoria e minimo 10 caratteri, senza limiti di invio, e la tabella `public.feedbacks` su Supabase (applicata e provata).
 14. **Nome: MaestraleGym.** «MyFitnessApp» è già preso sull'App Store; Valerio sceglie «MaestraleGym», registra l'App ID `com.maestralelabs.maestralegym` con notifiche push e Sign In with Apple, e crea l'app su App Store Connect.
 15. **MaestraleGym ovunque.** Valerio chiede di usare il nuovo nome dappertutto. Si rinominano il repository GitHub, il progetto Expo (nuovo `@maestrale-lab/maestralegym`), slug, scheme, pacchetto npm e la sessione di lavoro; l'Apple ID dell'app va in `eas.json`. Valerio rinomina anche il progetto Supabase dalla dashboard.
+16. **Percorso e allenamento.** Valerio vuole poter scegliere una scheda e allenarsi davvero. Nuova barra Home · Esercizi · Profilo; le schede diventano livelli e finiscono nella tab Esercizi (vista Schede); dalla Home si avvia l'allenamento, un esercizio alla volta, con pesi e ripetizioni che ripartono dall'ultima volta.
 
 ### Richiesta iniziale (testo integrale)
 

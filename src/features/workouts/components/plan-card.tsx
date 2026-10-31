@@ -3,19 +3,19 @@ import { useTranslation } from 'react-i18next';
 import { Pressable, Text, View } from 'react-native';
 
 import { Card } from '@/components/card';
-import { Icon, type IconData } from '@/components/icon';
+import { Icon } from '@/components/icon';
 import { icons } from '@/constants/icons';
-import { Spacing } from '@/constants/theme';
+import { Radius, Spacing } from '@/constants/theme';
 import { makeStyles } from '@/hooks/use-styles';
 import { useTheme } from '@/hooks/use-theme';
 import { useLocale } from '@/i18n';
 
 import type { WorkoutPlan } from '../types';
-import { PlanTags } from './plan-tags';
 
-const ICON_SIZE = 48;
+const BADGE_SIZE = 56;
 
-export function PlanCard({ plan }: { plan: WorkoutPlan }) {
+/** A plan in the list, shown as a step of the path: level number, name, days and weeks. */
+export function PlanCard({ plan, active }: { plan: WorkoutPlan; active: boolean }) {
   const styles = useStyles();
   const theme = useTheme();
   const locale = useLocale();
@@ -28,29 +28,29 @@ export function PlanCard({ plan }: { plan: WorkoutPlan }) {
           {({ pressed }) => (
             // Styles go on an inner view: `Link asChild` doesn't forward a style function on web.
             <View style={[styles.container, pressed && styles.pressed]}>
-              <View style={styles.header}>
-                <View style={styles.icon}>
-                  <Icon icon={icons.plan} size={24} color={theme.tint} />
-                </View>
-                <View style={styles.headerText}>
-                  <Text numberOfLines={2} style={styles.name}>
-                    {plan.name[locale]}
-                  </Text>
-                  <PlanTags plan={plan} />
-                </View>
-                <Icon icon={icons.chevronRight} size={18} color={theme.textSecondary} />
+              <View style={[styles.badge, active && styles.badgeActive]}>
+                <Text style={[styles.badgeLabel, active && styles.badgeTextActive]}>
+                  {t('plan.levelLabel')}
+                </Text>
+                <Text style={[styles.badgeNumber, active && styles.badgeTextActive]}>
+                  {plan.level}
+                </Text>
               </View>
-              <Text style={styles.summary}>{plan.summary[locale]}</Text>
-              <View style={styles.facts}>
-                <Fact
-                  icon={icons.daysPerWeek}
-                  label={t('plan.daysPerWeek', { count: plan.daysPerWeek })}
-                />
-                <Fact
-                  icon={icons.duration}
-                  label={t('plan.weeks', { count: plan.durationWeeks })}
-                />
+              <View style={styles.text}>
+                <Text numberOfLines={1} style={styles.name}>
+                  {plan.name[locale]}
+                </Text>
+                <Text style={styles.meta}>
+                  {t('plan.daysPerWeek', { count: plan.daysPerWeek })} ·{' '}
+                  {t('plan.weeks', { count: plan.durationWeeks })}
+                </Text>
+                {active ? (
+                  <View style={styles.activeTag}>
+                    <Text style={styles.activeTagText}>{t('plan.current')}</Text>
+                  </View>
+                ) : null}
               </View>
+              <Icon icon={icons.chevronRight} size={18} color={theme.textSecondary} />
             </View>
           )}
         </Pressable>
@@ -59,42 +59,46 @@ export function PlanCard({ plan }: { plan: WorkoutPlan }) {
   );
 }
 
-function Fact({ icon, label }: { icon: IconData; label: string }) {
-  const styles = useStyles();
-  const theme = useTheme();
-
-  return (
-    <View style={styles.fact}>
-      <Icon icon={icon} size={16} color={theme.textSecondary} />
-      <Text style={styles.factText}>{label}</Text>
-    </View>
-  );
-}
-
 const useStyles = makeStyles((theme) => ({
   container: {
-    gap: Spacing.three,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.four,
     padding: Spacing.four,
   },
   pressed: {
     backgroundColor: theme.background,
   },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: Spacing.three,
-  },
-  icon: {
-    width: ICON_SIZE,
-    height: ICON_SIZE,
-    borderRadius: ICON_SIZE / 2,
+  badge: {
+    width: BADGE_SIZE,
+    height: BADGE_SIZE,
+    borderRadius: Radius.medium,
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: theme.brandSoft,
   },
-  headerText: {
+  badgeActive: {
+    backgroundColor: theme.tint,
+  },
+  badgeLabel: {
+    fontSize: 9,
+    fontWeight: 700,
+    letterSpacing: 0.5,
+    textTransform: 'uppercase',
+    color: theme.tint,
+  },
+  badgeNumber: {
+    fontSize: 24,
+    fontWeight: 700,
+    lineHeight: 28,
+    color: theme.tint,
+  },
+  badgeTextActive: {
+    color: theme.onTint,
+  },
+  text: {
     flex: 1,
-    gap: Spacing.one,
+    gap: 2,
     alignItems: 'flex-start',
   },
   name: {
@@ -102,25 +106,20 @@ const useStyles = makeStyles((theme) => ({
     fontWeight: 600,
     color: theme.text,
   },
-  summary: {
-    fontSize: 14,
-    lineHeight: 20,
-    color: theme.textSecondary,
-  },
-  facts: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    columnGap: Spacing.four,
-    rowGap: Spacing.one,
-  },
-  fact: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: Spacing.one,
-  },
-  factText: {
+  meta: {
     fontSize: 13,
-    fontWeight: 500,
     color: theme.textSecondary,
+  },
+  activeTag: {
+    marginTop: Spacing.one,
+    paddingHorizontal: Spacing.two,
+    paddingVertical: 2,
+    borderRadius: Radius.pill,
+    backgroundColor: theme.brandSoft,
+  },
+  activeTagText: {
+    fontSize: 12,
+    fontWeight: 600,
+    color: theme.tint,
   },
 }));

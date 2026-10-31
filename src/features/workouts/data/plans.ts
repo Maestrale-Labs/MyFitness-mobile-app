@@ -63,13 +63,13 @@ const fullBodyB: WorkoutDay = {
 export const seedPlans: WorkoutPlan[] = [
   {
     id: 'full-body-beginner',
-    name: { it: 'Full body principiante', en: 'Beginner full body' },
+    name: { it: 'Full body', en: 'Full body' },
     summary: {
       it: 'Tre allenamenti a settimana per tutto il corpo. Pensata per chi inizia: pochi esercizi, soprattutto macchine e manubri.',
       en: 'Three full-body workouts a week. Built for beginners: few exercises, mostly machines and dumbbells.',
     },
     goal: 'muscleGain',
-    level: 'beginner',
+    level: 1,
     daysPerWeek: 3,
     durationWeeks: 8,
     schedule: {
@@ -81,13 +81,13 @@ export const seedPlans: WorkoutPlan[] = [
   },
   {
     id: 'upper-lower-beginner',
-    name: { it: 'Upper/Lower principiante', en: 'Beginner upper/lower' },
+    name: { it: 'Upper/Lower', en: 'Upper/Lower' },
     summary: {
       it: 'Quattro allenamenti a settimana: due per la parte alta del corpo e due per la parte bassa. Il passo successivo dopo qualche mese di full body.',
       en: 'Four workouts a week: two for the upper body and two for the lower body. The next step after a few months of full body.',
     },
     goal: 'muscleGain',
-    level: 'beginner',
+    level: 2,
     daysPerWeek: 4,
     durationWeeks: 8,
     schedule: {

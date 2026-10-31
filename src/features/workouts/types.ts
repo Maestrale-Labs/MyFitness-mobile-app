@@ -3,7 +3,6 @@ import type { Translations } from '@/i18n/locales/it';
 
 // The vocabularies are the translation keys, so adding a value without a label fails typecheck.
 export type PlanGoal = keyof Translations['planGoal'];
-export type PlanLevel = keyof Translations['planLevel'];
 
 /** One exercise of a workout, with its prescription. */
 export type PlanExercise = {
@@ -29,7 +28,8 @@ export type WorkoutPlan = {
   name: Localized;
   summary: Localized;
   goal: PlanGoal;
-  level: PlanLevel;
+  /** Plans are a path: level 1 first, then 2, 3… Lists are sorted by it. */
+  level: number;
   daysPerWeek: number;
   durationWeeks: number;
   /** How to spread the days over the week. */
