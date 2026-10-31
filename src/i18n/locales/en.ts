@@ -98,6 +98,8 @@ export const en: Translations = {
     openCalendar: 'Open the calendar',
     allWorkouts: 'See all ({{count}})',
     weekCount: '{{done}} of {{total}} workouts',
+    weekCountNoPlan_one: '{{count}} workout this week',
+    weekCountNoPlan_other: '{{count}} workouts this week',
     dayShort: 'D{{number}}',
     rest: 'Rest',
     calendarDone: '{{date}}: {{workout}}, done',

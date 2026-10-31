@@ -49,40 +49,40 @@ export type CalendarDay = {
   /**
    * done: a workout was finished that day. inProgress: today's workout is open.
    * planned: a training day still ahead. missed: a training day gone by without training.
-   * rest: no training planned. beforeStart: before the plan was chosen.
+   * rest: no training planned. free: no plan that day (none followed, or not yet chosen).
    */
-  status: 'done' | 'inProgress' | 'planned' | 'missed' | 'rest' | 'beforeStart';
+  status: 'done' | 'inProgress' | 'planned' | 'missed' | 'rest' | 'free';
   /** Index in `plan.days` of the workout done or planned that day. */
   dayIndex: number | null;
 };
 
 /**
- * The current week, Monday to Sunday. Workouts done show on the day they were done,
- * whatever the plan suggested; the plan's training weekdays still ahead get the next
- * workouts in order, starting from the one due next.
+ * The current week, Monday to Sunday. Every workout done shows on the day it was done,
+ * whatever plan it belonged to: the history stays even without a plan. With a plan, its
+ * training weekdays still ahead get the next workouts in order, starting from the one due
+ * next.
  */
 export function weekCalendar(
-  plan: WorkoutPlan,
-  activePlan: ActivePlan,
+  following: { plan: WorkoutPlan; activePlan: ActivePlan } | null,
   history: WorkoutSession[],
   current: WorkoutSession | null,
   today: Date,
 ): CalendarDay[] {
   const monday = startOfWeek(today);
   const todayStart = startOfDay(today);
-  const planStart = startOfDay(new Date(activePlan.startedAt));
-  const sessions = history.filter((session) => countsForPlan(session, activePlan));
-  const inProgressToday = current?.planId === plan.id ? current : null;
+  const plan = following?.plan;
+  const planStart = following ? startOfDay(new Date(following.activePlan.startedAt)) : null;
+  const inProgressToday = current;
   // Workouts still to place: the open one first (it's today's), then the next ones.
-  let nextIndex = inProgressToday
-    ? (inProgressToday.dayIndex + 1) % plan.days.length
-    : activePlan.nextDayIndex;
+  let nextIndex =
+    plan && inProgressToday?.planId === plan.id
+      ? (inProgressToday.dayIndex + 1) % plan.days.length
+      : (following?.activePlan.nextDayIndex ?? 0);
 
   return Array.from({ length: 7 }, (_, i): CalendarDay => {
     const date = addDays(monday, i);
     const isToday = sameDay(date, todayStart);
-    const done = sessions.find((session) => sameDay(new Date(session.finishedAt ?? ''), date));
-    const isTrainingDay = plan.weekdays.includes(i + 1);
+    const done = history.find((session) => sameDay(new Date(session.finishedAt ?? ''), date));
 
     if (done) {
       return { date, isToday, status: 'done', dayIndex: done.dayIndex };
@@ -90,10 +90,10 @@ export function weekCalendar(
     if (isToday && inProgressToday) {
       return { date, isToday, status: 'inProgress', dayIndex: inProgressToday.dayIndex };
     }
-    if (date < planStart) {
-      return { date, isToday, status: 'beforeStart', dayIndex: null };
+    if (!plan || !planStart || date < planStart) {
+      return { date, isToday, status: 'free', dayIndex: null };
     }
-    if (!isTrainingDay) {
+    if (!plan.weekdays.includes(i + 1)) {
       return { date, isToday, status: 'rest', dayIndex: null };
     }
     if (date < todayStart) {

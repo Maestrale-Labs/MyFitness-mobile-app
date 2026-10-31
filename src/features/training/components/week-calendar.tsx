@@ -38,9 +38,9 @@ export function WeekCalendar({ days, onSelect }: WeekCalendarProps) {
           planned: t('home.calendarPlanned', { date, workout }),
           missed: t('home.calendarMissed', { date }),
           rest: t('home.calendarRest', { date }),
-          beforeStart: date,
+          free: date,
         }[day.status];
-        const training = day.status !== 'rest' && day.status !== 'beforeStart';
+        const training = day.status !== 'rest' && day.status !== 'free';
 
         return (
           <Pressable

@@ -39,7 +39,15 @@ export default function HomeScreen() {
         <ThemedText type="title" accessibilityRole="header" style={styles.title}>
           {name ? t('home.greeting', { name: name.split(/\s+/)[0] }) : t('home.greetingNoName')}
         </ThemedText>
-        {plan ? <ActivePlan plan={plan} plans={plans} /> : <NoPlan />}
+        {plan ? (
+          <ActivePlan plan={plan} plans={plans} />
+        ) : (
+          <>
+            <NoPlan />
+            {/* The workouts done stay visible without a plan: they're the training history. */}
+            <ThisWeek plan={null} />
+          </>
+        )}
         <RecentWorkouts plans={plans} />
       </ScrollView>
     </Screen>
@@ -74,7 +82,6 @@ function ActivePlan({ plan, plans }: { plan: WorkoutPlan; plans: WorkoutPlan[] }
   const locale = useLocale();
   const { t } = useTranslation();
   const activePlan = useTraining((state) => state.activePlan)!;
-  const history = useTraining((state) => state.history);
   const current = useTraining((state) => state.current);
   const done = useTraining(completedWorkouts);
   const startWorkout = useTraining((state) => state.startWorkout);
@@ -84,8 +91,6 @@ function ActivePlan({ plan, plans }: { plan: WorkoutPlan; plans: WorkoutPlan[] }
   const finished = done >= total;
   const today = useToday();
   const week = planWeek(activePlan, plan, today);
-  const days = weekCalendar(plan, activePlan, history, current, today);
-  const doneThisWeek = days.filter((item) => item.status === 'done').length;
   const dayIndex = current?.planId === plan.id ? current.dayIndex : activePlan.nextDayIndex;
   const day = plan.days[dayIndex] ?? plan.days[0];
   const nextLevel = plans.find((item) => item.level === plan.level + 1);
@@ -129,29 +134,7 @@ function ActivePlan({ plan, plans }: { plan: WorkoutPlan; plans: WorkoutPlan[] }
         </View>
       </Card>
 
-      <SectionLabel>{t('home.thisWeek')}</SectionLabel>
-      <Card>
-        <View style={styles.weekCard}>
-          <View style={styles.row}>
-            <Text style={[styles.flex, styles.monthLabel]}>
-              {formatWeekMonths(
-                days.map((item) => item.date),
-                locale,
-              )}
-            </Text>
-            <ArrowLink label={t('home.openCalendar')} onPress={() => router.push('/calendar')} />
-          </View>
-          <WeekCalendar
-            days={days}
-            onSelect={(date) =>
-              router.push({ pathname: '/calendar', params: { date: dateKey(date) } })
-            }
-          />
-          <Text style={[styles.meta, styles.centered]}>
-            {t('home.weekCount', { done: doneThisWeek, total: plan.daysPerWeek })}
-          </Text>
-        </View>
-      </Card>
+      <ThisWeek plan={plan} />
 
       {finished && !current ? (
         <Card>
@@ -201,6 +184,57 @@ function ActivePlan({ plan, plans }: { plan: WorkoutPlan; plans: WorkoutPlan[] }
           </Card>
         </>
       )}
+    </>
+  );
+}
+
+/**
+ * Monday to Sunday with the workouts done and, with a plan, the training days ahead;
+ * links to the full calendar.
+ */
+function ThisWeek({ plan }: { plan: WorkoutPlan | null }) {
+  const styles = useStyles();
+  const locale = useLocale();
+  const { t } = useTranslation();
+  const activePlan = useTraining((state) => state.activePlan);
+  const history = useTraining((state) => state.history);
+  const current = useTraining((state) => state.current);
+  const today = useToday();
+  const days = weekCalendar(
+    plan && activePlan ? { plan, activePlan } : null,
+    history,
+    current,
+    today,
+  );
+  const doneThisWeek = days.filter((item) => item.status === 'done').length;
+
+  return (
+    <>
+      <SectionLabel>{t('home.thisWeek')}</SectionLabel>
+      <Card>
+        <View style={styles.weekCard}>
+          <View style={styles.row}>
+            <Text style={[styles.flex, styles.monthLabel]}>
+              {formatWeekMonths(
+                days.map((item) => item.date),
+                locale,
+              )}
+            </Text>
+            <ArrowLink label={t('home.openCalendar')} onPress={() => router.push('/calendar')} />
+          </View>
+          <WeekCalendar
+            days={days}
+            onSelect={(date) =>
+              router.push({ pathname: '/calendar', params: { date: dateKey(date) } })
+            }
+          />
+          <Text style={[styles.meta, styles.centered]}>
+            {plan
+              ? t('home.weekCount', { done: doneThisWeek, total: plan.daysPerWeek })
+              : t('home.weekCountNoPlan', { count: doneThisWeek })}
+          </Text>
+        </View>
+      </Card>
     </>
   );
 }

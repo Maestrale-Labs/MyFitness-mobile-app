@@ -98,6 +98,8 @@ export const it = {
     openCalendar: 'Apri il calendario',
     allWorkouts: 'Vedi tutti ({{count}})',
     weekCount: '{{done}} di {{total}} allenamenti',
+    weekCountNoPlan_one: '{{count}} allenamento questa settimana',
+    weekCountNoPlan_other: '{{count}} allenamenti questa settimana',
     dayShort: 'G{{number}}',
     rest: 'Riposo',
     calendarDone: '{{date}}: {{workout}}, fatto',
