@@ -95,7 +95,8 @@ export const it = {
     repeatPlan: 'Ripeti la scheda',
     recent: 'Ultimi allenamenti',
     thisWeek: 'Questa settimana',
-    calendarLink: 'Calendario',
+    openCalendar: 'Apri il calendario',
+    allWorkouts: 'Vedi tutti gli allenamenti',
     weekCount: '{{done}} di {{total}} allenamenti',
     dayShort: 'G{{number}}',
     rest: 'Riposo',
@@ -122,7 +123,16 @@ export const it = {
     logPastHint:
       'Te lo eri dimenticato? Segna ora pesi e ripetizioni: l’allenamento resta in questa data.',
     currentOpen: 'Hai un allenamento in corso: finiscilo prima di segnarne un altro.',
+    whichDay: 'Quale allenamento hai fatto?',
     workoutTitle: '{{day}} · {{plan}}',
+  },
+  history: {
+    title: 'Allenamenti fatti',
+    empty: 'Non hai ancora fatto nessun allenamento.',
+    delete: 'Elimina allenamento',
+    deleteTitle: 'Eliminare l’allenamento?',
+    deleteMessage: 'Sparirà dal calendario e dai progressi della scheda. Non si può annullare.',
+    deleteConfirm: 'Elimina',
   },
   session: {
     loggedFor: 'Per {{date}}',

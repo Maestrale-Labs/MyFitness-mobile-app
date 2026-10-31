@@ -1,5 +1,5 @@
 import { useTranslation } from 'react-i18next';
-import { Text, View } from 'react-native';
+import { Pressable, Text, View } from 'react-native';
 
 import { Icon } from '@/components/icon';
 import { icons } from '@/constants/icons';
@@ -10,8 +10,14 @@ import { useLocale } from '@/i18n';
 
 import type { CalendarDay } from '../calendar';
 
+type WeekCalendarProps = {
+  days: CalendarDay[];
+  /** Opens a day, e.g. to see what was done or log a forgotten workout. */
+  onSelect: (date: Date) => void;
+};
+
 /** Monday to Sunday: workouts done, the ones ahead, and rest days. */
-export function WeekCalendar({ days }: { days: CalendarDay[] }) {
+export function WeekCalendar({ days, onSelect }: WeekCalendarProps) {
   const styles = useStyles();
   const theme = useTheme();
   const locale = useLocale();
@@ -37,11 +43,16 @@ export function WeekCalendar({ days }: { days: CalendarDay[] }) {
         const training = day.status !== 'rest' && day.status !== 'beforeStart';
 
         return (
-          <View
+          <Pressable
             key={day.date.toISOString()}
-            accessible
+            accessibilityRole="button"
             accessibilityLabel={label}
-            style={[styles.day, day.isToday && styles.today]}>
+            onPress={() => onSelect(day.date)}
+            style={({ pressed }) => [
+              styles.day,
+              day.isToday && styles.today,
+              pressed && styles.pressed,
+            ]}>
             <Text style={[styles.weekday, day.isToday && styles.todayText]}>
               {day.date.toLocaleDateString(locale, { weekday: 'narrow' })}
             </Text>
@@ -68,7 +79,7 @@ export function WeekCalendar({ days }: { days: CalendarDay[] }) {
                   ? t('home.rest')
                   : ''}
             </Text>
-          </View>
+          </Pressable>
         );
       })}
     </View>
@@ -91,6 +102,9 @@ const useStyles = makeStyles((theme) => ({
   },
   today: {
     backgroundColor: theme.brandSoft,
+  },
+  pressed: {
+    opacity: 0.6,
   },
   weekday: {
     fontSize: 11,

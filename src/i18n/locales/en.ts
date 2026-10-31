@@ -95,7 +95,8 @@ export const en: Translations = {
     repeatPlan: 'Repeat the plan',
     recent: 'Recent workouts',
     thisWeek: 'This week',
-    calendarLink: 'Calendar',
+    openCalendar: 'Open the calendar',
+    allWorkouts: 'See all workouts',
     weekCount: '{{done}} of {{total}} workouts',
     dayShort: 'D{{number}}',
     rest: 'Rest',
@@ -121,7 +122,17 @@ export const en: Translations = {
     logPast: 'Log a workout you did',
     logPastHint: 'Forgot to log it? Enter weights and reps now: the workout stays on this date.',
     currentOpen: 'You have a workout in progress: finish it before logging another.',
+    whichDay: 'Which workout did you do?',
     workoutTitle: '{{day}} · {{plan}}',
+  },
+  history: {
+    title: 'Workouts done',
+    empty: 'You haven’t done any workout yet.',
+    delete: 'Delete workout',
+    deleteTitle: 'Delete the workout?',
+    deleteMessage:
+      'It will disappear from the calendar and from the plan’s progress. This can’t be undone.',
+    deleteConfirm: 'Delete',
   },
   session: {
     loggedFor: 'For {{date}}',

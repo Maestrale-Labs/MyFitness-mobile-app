@@ -20,9 +20,10 @@ type TrainingState = {
   leavePlan: () => void;
   /**
    * Opens the plan's next workout. With `loggedFor`, it's a workout done on that past day
-   * and forgotten: it's saved with that date.
+   * and forgotten: it's saved with that date, and `dayIndex` says which day of the plan
+   * it was (the next one by default).
    */
-  startWorkout: (plan: WorkoutPlan, loggedFor?: Date) => void;
+  startWorkout: (plan: WorkoutPlan, loggedFor?: Date, dayIndex?: number) => void;
   updateSet: (exerciseIndex: number, setIndex: number, patch: Partial<LoggedSet>) => void;
   setExerciseStatus: (exerciseIndex: number, status: LoggedExercise['status']) => void;
   /**
@@ -31,6 +32,8 @@ type TrainingState = {
    */
   finishWorkout: (plan: WorkoutPlan) => WorkoutSession | null;
   discardWorkout: () => void;
+  /** Removes a finished workout, e.g. one logged by mistake. */
+  deleteWorkout: (id: string) => void;
 };
 
 /** The sets logged for an exercise in the most recent finished workout that had it. */
@@ -115,12 +118,13 @@ export const useTraining = create<TrainingState>()(
 
       leavePlan: () => set({ activePlan: null, current: null }),
 
-      startWorkout: (plan, loggedFor) => {
+      startWorkout: (plan, loggedFor, chosenDayIndex) => {
         const { activePlan, history, current } = get();
         if (current) {
           return;
         }
-        const dayIndex = activePlan?.planId === plan.id ? activePlan.nextDayIndex : 0;
+        const dayIndex =
+          chosenDayIndex ?? (activePlan?.planId === plan.id ? activePlan.nextDayIndex : 0);
         const day = plan.days[dayIndex] ?? plan.days[0];
         set({
           current: {
@@ -179,8 +183,10 @@ export const useTraining = create<TrainingState>()(
             return { ...exercise, status, sets };
           }),
         };
+        // The plan moves on when the workout due next is done; a forgotten one logged for
+        // another day of the plan leaves it where it is.
         const nextActive =
-          activePlan?.planId === plan.id
+          activePlan?.planId === plan.id && current.dayIndex === activePlan.nextDayIndex
             ? { ...activePlan, nextDayIndex: (current.dayIndex + 1) % plan.days.length }
             : activePlan;
         // Kept in day order, so a forgotten workout logged now sits where it belongs.
@@ -204,6 +210,9 @@ export const useTraining = create<TrainingState>()(
       },
 
       discardWorkout: () => set({ current: null }),
+
+      deleteWorkout: (id) =>
+        set((state) => ({ history: state.history.filter((session) => session.id !== id) })),
     }),
     {
       name: 'training',

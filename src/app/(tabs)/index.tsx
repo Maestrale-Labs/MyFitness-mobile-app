@@ -1,6 +1,6 @@
 import { router } from 'expo-router';
 import { useTranslation } from 'react-i18next';
-import { ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 
 import { Button } from '@/components/button';
 import { Card } from '@/components/card';
@@ -11,7 +11,7 @@ import { ThemedText } from '@/components/themed-text';
 import { icons } from '@/constants/icons';
 import { Radius, Spacing } from '@/constants/theme';
 import { useSettings } from '@/features/settings/store';
-import { formatWeekMonths, planWeek, weekCalendar } from '@/features/training/calendar';
+import { dateKey, formatWeekMonths, planWeek, weekCalendar } from '@/features/training/calendar';
 import { WeekCalendar } from '@/features/training/components/week-calendar';
 import { completedWorkouts, useTraining } from '@/features/training/store';
 import { useWorkoutPlans } from '@/features/workouts/queries';
@@ -139,16 +139,14 @@ function ActivePlan({ plan, plans }: { plan: WorkoutPlan; plans: WorkoutPlan[] }
                 locale,
               )}
             </Text>
-            <View>
-              <Button
-                variant="plain"
-                label={t('home.calendarLink')}
-                icon={icons.chevronRight}
-                onPress={() => router.push('/calendar')}
-              />
-            </View>
+            <ArrowLink label={t('home.openCalendar')} onPress={() => router.push('/calendar')} />
           </View>
-          <WeekCalendar days={days} />
+          <WeekCalendar
+            days={days}
+            onSelect={(date) =>
+              router.push({ pathname: '/calendar', params: { date: dateKey(date) } })
+            }
+          />
           <Text style={[styles.meta, styles.centered]}>
             {t('home.weekCount', { done: doneThisWeek, total: plan.daysPerWeek })}
           </Text>
@@ -220,15 +218,33 @@ function RecentWorkouts({ plans }: { plans: WorkoutPlan[] }) {
 
   return (
     <>
-      <SectionLabel>{t('home.recent')}</SectionLabel>
+      <View style={styles.sectionHeader}>
+        <View style={styles.flex}>
+          <SectionLabel>{t('home.recent')}</SectionLabel>
+        </View>
+        <View style={styles.sectionArrow}>
+          <ArrowLink label={t('home.allWorkouts')} onPress={() => router.push('/history')} />
+        </View>
+      </View>
       <Card>
         {recent.map((session, index) => {
           const plan = plans.find((item) => item.id === session.planId);
           const done = session.exercises.filter((exercise) => exercise.status === 'done').length;
           return (
-            <View
+            <Pressable
               key={session.id}
-              style={[styles.recentRow, index < recent.length - 1 && styles.divider]}>
+              accessibilityRole="button"
+              onPress={() =>
+                router.push({
+                  pathname: '/calendar',
+                  params: { date: dateKey(new Date(session.finishedAt ?? session.startedAt)) },
+                })
+              }
+              style={({ pressed }) => [
+                styles.recentRow,
+                index < recent.length - 1 && styles.divider,
+                pressed && styles.pressed,
+              ]}>
               <View style={styles.flex}>
                 <Text style={styles.recentTitle}>
                   {t('home.recentItem', {
@@ -244,7 +260,7 @@ function RecentWorkouts({ plans }: { plans: WorkoutPlan[] }) {
                   month: 'short',
                 })}
               </Text>
-            </View>
+            </Pressable>
           );
         })}
       </Card>
@@ -252,7 +268,46 @@ function RecentWorkouts({ plans }: { plans: WorkoutPlan[] }) {
   );
 }
 
+/** A round arrow that opens a related page, e.g. the full calendar. */
+function ArrowLink({ label, onPress }: { label: string; onPress: () => void }) {
+  const styles = useStyles();
+
+  return (
+    <Pressable
+      accessibilityRole="link"
+      accessibilityLabel={label}
+      onPress={onPress}
+      hitSlop={8}
+      style={({ pressed }) => [styles.arrow, pressed && styles.arrowPressed]}>
+      <Icon icon={icons.chevronRight} size={18} strokeWidth={2} />
+    </Pressable>
+  );
+}
+
 const useStyles = makeStyles((theme) => ({
+  // Lines the arrow up with the section label, which has its own top and bottom margins.
+  sectionHeader: {
+    flexDirection: 'row',
+    alignItems: 'flex-end',
+    marginBottom: -Spacing.two,
+  },
+  sectionArrow: {
+    marginBottom: -Spacing.four,
+  },
+  arrow: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: theme.surfaceMuted,
+  },
+  arrowPressed: {
+    opacity: 0.7,
+  },
+  pressed: {
+    backgroundColor: theme.background,
+  },
   content: {
     gap: Spacing.four,
   },

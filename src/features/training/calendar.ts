@@ -133,3 +133,15 @@ export function formatWeekMonths(days: Date[], locale: string) {
     ? `${month(first)} ${first.getFullYear()}`
     : `${month(first)} – ${month(last)} ${last.getFullYear()}`;
 }
+
+/** "2026-10-28": a day as a URL parameter. */
+export function dateKey(date: Date) {
+  const pad = (value: number) => String(value).padStart(2, '0');
+  return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`;
+}
+
+/** The day of a `dateKey`, or null if it isn't one. */
+export function parseDateKey(key: string | undefined) {
+  const match = key?.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+  return match ? new Date(Number(match[1]), Number(match[2]) - 1, Number(match[3])) : null;
+}

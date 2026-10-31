@@ -1,20 +1,26 @@
-import { router } from 'expo-router';
+import { router, useLocalSearchParams } from 'expo-router';
 import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Pressable, ScrollView, Text, View } from 'react-native';
 
 import { Button } from '@/components/button';
 import { Card } from '@/components/card';
+import { Chip } from '@/components/chip';
 import { Icon } from '@/components/icon';
 import { Screen } from '@/components/screen';
 import { SubScreenHeader } from '@/components/sub-screen-header';
 import { icons } from '@/constants/icons';
 import { Spacing } from '@/constants/theme';
-import { useExercises } from '@/features/exercises/queries';
-import { addDays, monthGrid, sameDay, startOfDay, startOfWeek } from '@/features/training/calendar';
-import { formatSets } from '@/features/training/format';
+import {
+  addDays,
+  monthGrid,
+  parseDateKey,
+  sameDay,
+  startOfDay,
+  startOfWeek,
+} from '@/features/training/calendar';
+import { WorkoutDetails } from '@/features/training/components/workout-details';
 import { useTraining } from '@/features/training/store';
-import type { WorkoutSession } from '@/features/training/types';
 import { useWorkoutPlans } from '@/features/workouts/queries';
 import { makeStyles } from '@/hooks/use-styles';
 import { useToday } from '@/hooks/use-today';
@@ -24,7 +30,8 @@ const CELL = 40;
 
 /**
  * Every workout done, month by month. Tapping a day shows what was done; on a past day
- * with nothing, a forgotten workout can be logged with that date.
+ * with nothing, a forgotten workout can be logged with that date. Opens on `?date=` when
+ * given (a day tapped in Home's week), otherwise on today.
  */
 export default function CalendarScreen() {
   const styles = useStyles();
@@ -36,10 +43,14 @@ export default function CalendarScreen() {
   const current = useTraining((state) => state.current);
   const startWorkout = useTraining((state) => state.startWorkout);
   const { data: plans = [] } = useWorkoutPlans();
-  const { data: exercises = [] } = useExercises();
+  const { date } = useLocalSearchParams<{ date?: string }>();
 
-  const [month, setMonth] = useState(() => new Date(today.getFullYear(), today.getMonth(), 1));
-  const [selected, setSelected] = useState(() => startOfDay(today));
+  const [selected, setSelected] = useState(() => parseDateKey(date) ?? startOfDay(today));
+  const [month, setMonth] = useState(
+    () => new Date(selected.getFullYear(), selected.getMonth(), 1),
+  );
+  // Which day of the plan a forgotten workout was: the one due next, unless changed.
+  const [logDayIndex, setLogDayIndex] = useState(activePlan?.nextDayIndex ?? 0);
 
   const plan = plans.find((item) => item.id === activePlan?.planId);
   const planStart = activePlan ? startOfDay(new Date(activePlan.startedAt)) : null;
@@ -80,7 +91,7 @@ export default function CalendarScreen() {
     if (!plan) {
       return;
     }
-    startWorkout(plan, selected);
+    startWorkout(plan, selected, logDayIndex);
     router.push('/workout');
   }
 
@@ -182,14 +193,7 @@ export default function CalendarScreen() {
             </Text>
             {selectedSessions.length > 0 ? (
               selectedSessions.map((session) => (
-                <SessionDetails
-                  key={session.id}
-                  session={session}
-                  planName={plans.find((item) => item.id === session.planId)?.name[locale] ?? ''}
-                  exerciseName={(id) =>
-                    exercises.find((exercise) => exercise.id === id)?.name[locale] ?? id
-                  }
-                />
+                <WorkoutDetails key={session.id} session={session} />
               ))
             ) : selected > todayStart ? (
               <Text style={styles.message}>{t('calendar.future')}</Text>
@@ -198,6 +202,21 @@ export default function CalendarScreen() {
             ) : canLog ? (
               <>
                 <Text style={styles.message}>{t('calendar.logPastHint')}</Text>
+                {plan && plan.days.length > 1 ? (
+                  <>
+                    <Text style={styles.whichDay}>{t('calendar.whichDay')}</Text>
+                    <View style={styles.chips}>
+                      {plan.days.map((_, index) => (
+                        <Chip
+                          key={index}
+                          label={t('plan.day', { number: index + 1 })}
+                          selected={index === logDayIndex}
+                          onPress={() => setLogDayIndex(index)}
+                        />
+                      ))}
+                    </View>
+                  </>
+                ) : null}
                 <Button icon={icons.start} label={t('calendar.logPast')} onPress={logPast} />
               </>
             ) : planStart && selected < planStart ? (
@@ -209,39 +228,6 @@ export default function CalendarScreen() {
         </Card>
       </ScrollView>
     </Screen>
-  );
-}
-
-type SessionDetailsProps = {
-  session: WorkoutSession;
-  planName: string;
-  exerciseName: (id: string) => string;
-};
-
-/** What was done in a workout: each exercise with its sets. */
-function SessionDetails({ session, planName, exerciseName }: SessionDetailsProps) {
-  const styles = useStyles();
-  const locale = useLocale();
-  const { t } = useTranslation();
-  const done = session.exercises.filter((exercise) => exercise.status === 'done');
-
-  return (
-    <View style={styles.session}>
-      <Text style={styles.sessionTitle}>
-        {t('calendar.workoutTitle', {
-          day: t('plan.day', { number: session.dayIndex + 1 }),
-          plan: planName,
-        })}
-      </Text>
-      {done.map((exercise, index) => (
-        <View
-          key={`${exercise.exerciseId}-${index}`}
-          style={[styles.exerciseRow, index < done.length - 1 && styles.divider]}>
-          <Text style={styles.exerciseName}>{exerciseName(exercise.exerciseId)}</Text>
-          <Text style={styles.exerciseSets}>{formatSets(exercise.sets, locale)}</Text>
-        </View>
-      ))}
-    </View>
   );
 }
 
@@ -347,33 +333,19 @@ const useStyles = makeStyles((theme) => ({
     fontWeight: 600,
     color: theme.text,
   },
+  whichDay: {
+    fontSize: 15,
+    fontWeight: 600,
+    color: theme.text,
+  },
+  chips: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: Spacing.two,
+  },
   message: {
     fontSize: 15,
     lineHeight: 21,
-    color: theme.textSecondary,
-  },
-  session: {
-    gap: Spacing.one,
-  },
-  sessionTitle: {
-    fontSize: 15,
-    fontWeight: 600,
-    color: theme.tint,
-  },
-  exerciseRow: {
-    gap: 2,
-    paddingVertical: Spacing.two,
-  },
-  divider: {
-    borderBottomWidth: StyleSheet.hairlineWidth,
-    borderBottomColor: theme.separator,
-  },
-  exerciseName: {
-    fontSize: 16,
-    color: theme.text,
-  },
-  exerciseSets: {
-    fontSize: 14,
     color: theme.textSecondary,
   },
 }));
