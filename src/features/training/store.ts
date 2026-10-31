@@ -20,9 +20,11 @@ type TrainingState = {
   startWorkout: (plan: WorkoutPlan) => void;
   updateSet: (exerciseIndex: number, setIndex: number, patch: Partial<LoggedSet>) => void;
   addSet: (exerciseIndex: number) => void;
+  /** Removes the last set not done yet; an exercise keeps at least one set. */
+  removeSet: (exerciseIndex: number) => void;
   completeExercise: (exerciseIndex: number) => void;
   skipExercise: (exerciseIndex: number) => void;
-  swapExercise: (exerciseIndex: number, exerciseId: string) => void;
+  swapExercise: (exerciseIndex: number, exerciseId: string, defaultReps: number) => void;
   /**
    * Saves the workout and moves on to the next day. Returns the saved workout, or null
    * when no set was ticked: an empty workout is dropped and doesn't count.
@@ -55,12 +57,24 @@ export function completedWorkouts(state: Pick<TrainingState, 'activePlan' | 'his
   ).length;
 }
 
-/** Sets for a new workout, prefilled with what was lifted last time. */
-function prefilledSets(history: WorkoutSession[], exerciseId: string, count: number) {
+/**
+ * Sets for a new workout, prefilled with what was done last time; the first time, reps
+ * start from the top of the target and the weight is left for the user.
+ */
+function prefilledSets(
+  history: WorkoutSession[],
+  exerciseId: string,
+  count: number,
+  defaultReps: number,
+) {
   const last = lastSetsFor(history, exerciseId);
   return Array.from({ length: count }, (_, index): LoggedSet => {
     const previous = last?.[Math.min(index, last.length - 1)];
-    return { weightKg: previous?.weightKg ?? null, reps: previous?.reps ?? null, done: false };
+    return {
+      weightKg: previous?.weightKg ?? null,
+      reps: previous?.reps ?? defaultReps,
+      done: false,
+    };
   });
 }
 
@@ -121,7 +135,7 @@ export const useTraining = create<TrainingState>()(
               exerciseId: item.exerciseId,
               plannedExerciseId: item.exerciseId,
               status: 'pending',
-              sets: prefilledSets(history, item.exerciseId, item.sets),
+              sets: prefilledSets(history, item.exerciseId, item.sets, item.reps.max),
             })),
           },
         });
@@ -152,6 +166,17 @@ export const useTraining = create<TrainingState>()(
           }),
         ),
 
+      removeSet: (exerciseIndex) =>
+        set((state) =>
+          updateCurrent(state, exerciseIndex, (exercise) => {
+            const index = exercise.sets.findLastIndex((item) => !item.done);
+            if (index === -1 || exercise.sets.length <= 1) {
+              return exercise;
+            }
+            return { ...exercise, sets: exercise.sets.filter((_, i) => i !== index) };
+          }),
+        ),
+
       completeExercise: (exerciseIndex) =>
         set((state) =>
           updateCurrent(state, exerciseIndex, (exercise) => ({ ...exercise, status: 'done' })),
@@ -162,12 +187,12 @@ export const useTraining = create<TrainingState>()(
           updateCurrent(state, exerciseIndex, (exercise) => ({ ...exercise, status: 'skipped' })),
         ),
 
-      swapExercise: (exerciseIndex, exerciseId) =>
+      swapExercise: (exerciseIndex, exerciseId, defaultReps) =>
         set((state) =>
           updateCurrent(state, exerciseIndex, (exercise) => ({
             ...exercise,
             exerciseId,
-            sets: prefilledSets(state.history, exerciseId, exercise.sets.length),
+            sets: prefilledSets(state.history, exerciseId, exercise.sets.length, defaultReps),
           })),
         ),
 

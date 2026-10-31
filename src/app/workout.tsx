@@ -1,8 +1,8 @@
 import { Image } from 'expo-image';
 import { router } from 'expo-router';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Pressable, ScrollView, Text, View } from 'react-native';
+import { Keyboard, Pressable, ScrollView, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { Button } from '@/components/button';
@@ -14,8 +14,9 @@ import { icons } from '@/constants/icons';
 import { Radius, Spacing } from '@/constants/theme';
 import { useExercises } from '@/features/exercises/queries';
 import type { Exercise } from '@/features/exercises/types';
-import { RestTimer } from '@/features/training/components/rest-timer';
-import { SetHeader, SetRow } from '@/features/training/components/set-row';
+import { RestView } from '@/features/training/components/rest-view';
+import { SetList } from '@/features/training/components/set-list';
+import { Stepper } from '@/features/training/components/stepper';
 import { SwapSheet } from '@/features/training/components/swap-sheet';
 import { formatSets, formatWeight, sessionTotals } from '@/features/training/format';
 import { lastSetsFor, useTraining } from '@/features/training/store';
@@ -28,6 +29,9 @@ import { useTheme } from '@/hooks/use-theme';
 import { useLocale } from '@/i18n';
 import { confirm } from '@/utils/confirm';
 
+/** − and + on the weight: the smallest common plate pair. */
+const WEIGHT_STEP_KG = 2.5;
+
 /** Back to where the workout was opened from: Home, or Home anyway after a reload. */
 function leaveWorkout() {
   if (router.canGoBack()) {
@@ -38,8 +42,9 @@ function leaveWorkout() {
 }
 
 /**
- * The workout being done: one exercise at a time, with its sets to fill in and tick.
- * Everything is saved as it's typed, so leaving and coming back resumes where it was.
+ * The workout being done, one set at a time: adjust kg and reps, "Set done", rest, next
+ * set; after the last set, the next exercise. Everything is saved as it changes, so
+ * leaving and coming back resumes where it was.
  */
 export default function WorkoutScreen() {
   const current = useTraining((state) => state.current);
@@ -72,6 +77,9 @@ type ActiveWorkoutProps = {
   onFinish: (session: WorkoutSession) => void;
 };
 
+/** A rest in progress; `nextExercise` is set when the rest leads to another exercise. */
+type Rest = { id: number; seconds: number; next: string; nextExercise: number | null };
+
 function ActiveWorkout({ session, plan, exercises, onFinish }: ActiveWorkoutProps) {
   const styles = useStyles();
   const theme = useTheme();
@@ -82,16 +90,14 @@ function ActiveWorkout({ session, plan, exercises, onFinish }: ActiveWorkoutProp
   const history = useTraining((state) => state.history);
   const actions = useTraining.getState();
 
-  const [index, setIndex] = useState(() =>
+  const [index, setExerciseIndex] = useState(() =>
     Math.max(
       0,
       session.exercises.findIndex((exercise) => exercise.status === 'pending'),
     ),
   );
-  // Rest after a ticked set; `id` restarts the timer when another set is ticked.
-  const [rest, setRest] = useState<{ seconds: number; id: number } | null>(null);
+  const [rest, setRest] = useState<Rest | null>(null);
   const [swapping, setSwapping] = useState(false);
-  const endRest = useCallback(() => setRest(null), []);
 
   const exercisesById = useMemo(
     () => new Map(exercises.map((exercise) => [exercise.id, exercise])),
@@ -107,41 +113,66 @@ function ActiveWorkout({ session, plan, exercises, onFinish }: ActiveWorkoutProp
   const last = lastSetsFor(history, logged.exerciseId);
   const hitAllReps =
     last !== null && last.length > 0 && last.every((set) => (set.reps ?? 0) >= planned.reps.max);
-  const isLast = index === session.exercises.length - 1;
-  const anyDone = logged.sets.some((set) => set.done);
+  const isLastExercise = index === session.exercises.length - 1;
+  const setIndex = logged.sets.findIndex((set) => !set.done);
+  const currentSet = setIndex === -1 ? null : logged.sets[setIndex];
+  const canRemoveSet = logged.sets.length > 1 && logged.sets.some((set) => !set.done);
   const swapOptions = exercise
     ? exercises.filter(
         (item) => item.muscleGroup === exercise.muscleGroup && item.id !== exercise.id,
       )
     : [];
-  const repsPlaceholder =
-    planned.reps.min === planned.reps.max
-      ? String(planned.reps.min)
-      : t('plan.repsRange', planned.reps);
-
-  function toggleSet(setIndex: number) {
-    const set = logged.sets[setIndex];
-    if (set.done) {
-      actions.updateSet(index, setIndex, { done: false });
-      return;
-    }
-    // A set ticked without reps counts the low end of the target.
-    actions.updateSet(index, setIndex, { done: true, reps: set.reps ?? planned.reps.min });
-    // Its weight carries over to the next sets still empty, so it's typed once.
-    logged.sets.forEach((item, i) => {
-      if (i > setIndex && !item.done && item.weightKg === null && set.weightKg !== null) {
-        actions.updateSet(index, i, { weightKg: set.weightKg });
-      }
-    });
-    const remaining = logged.sets.filter((item, i) => i !== setIndex && !item.done).length;
-    if (remaining > 0) {
-      setRest((previous) => ({ seconds: planned.restSeconds, id: (previous?.id ?? 0) + 1 }));
-    }
-  }
 
   function goTo(nextIndex: number) {
     setRest(null);
-    setIndex(nextIndex);
+    setExerciseIndex(nextIndex);
+  }
+
+  function startRest(next: string, nextExercise: number | null) {
+    setRest((previous) => ({
+      id: (previous?.id ?? 0) + 1,
+      seconds: planned.restSeconds,
+      next,
+      nextExercise,
+    }));
+  }
+
+  function setDone() {
+    if (!currentSet) {
+      return;
+    }
+    Keyboard.dismiss();
+    actions.updateSet(index, setIndex, {
+      done: true,
+      reps: currentSet.reps ?? planned.reps.min,
+    });
+    // The weight carries over to the next sets still empty, so it's set once.
+    logged.sets.forEach((item, i) => {
+      if (i > setIndex && !item.done && item.weightKg === null && currentSet.weightKg !== null) {
+        actions.updateSet(index, i, { weightKg: currentSet.weightKg });
+      }
+    });
+
+    const nextSet = logged.sets.findIndex((item, i) => i !== setIndex && !item.done);
+    if (nextSet !== -1) {
+      startRest(t('session.restNextSet', { number: nextSet + 1, total: logged.sets.length }), null);
+      return;
+    }
+    actions.completeExercise(index);
+    if (isLastExercise) {
+      void finish();
+      return;
+    }
+    const nextExercise = exercisesById.get(session.exercises[index + 1].exerciseId);
+    startRest(t('session.restNextExercise', { name: nextExercise?.name[locale] ?? '' }), index + 1);
+  }
+
+  function endRest() {
+    if (rest?.nextExercise != null) {
+      goTo(rest.nextExercise);
+    } else {
+      setRest(null);
+    }
   }
 
   async function finish() {
@@ -168,11 +199,11 @@ function ActiveWorkout({ session, plan, exercises, onFinish }: ActiveWorkoutProp
     }
   }
 
-  function next() {
-    if (anyDone) {
+  function nextExercise() {
+    if (logged.sets.some((set) => set.done)) {
       actions.completeExercise(index);
     }
-    if (isLast) {
+    if (isLastExercise) {
       void finish();
     } else {
       goTo(index + 1);
@@ -181,7 +212,7 @@ function ActiveWorkout({ session, plan, exercises, onFinish }: ActiveWorkoutProp
 
   function skip() {
     actions.skipExercise(index);
-    if (isLast) {
+    if (isLastExercise) {
       void finish();
     } else {
       goTo(index + 1);
@@ -260,114 +291,159 @@ function ActiveWorkout({ session, plan, exercises, onFinish }: ActiveWorkoutProp
         ))}
       </View>
 
-      <ScrollView
-        key={index}
-        keyboardShouldPersistTaps="handled"
-        keyboardDismissMode="interactive"
-        automaticallyAdjustKeyboardInsets
-        showsVerticalScrollIndicator={false}
-        contentContainerStyle={styles.content}>
-        {exercise ? (
-          <>
-            {/* The animation has a white background, so it sits on white in dark mode too. */}
-            <Card style={styles.mediaCard}>
-              <View style={styles.mediaFrame}>
-                <Image
-                  source={exercise.media.gif}
-                  placeholder={exercise.media.thumbnail}
-                  style={styles.media}
-                  contentFit="contain"
-                  autoplay
-                  accessibilityLabel={exercise.name[locale]}
-                  accessibilityIgnoresInvertColors
+      {rest ? (
+        <View style={[styles.flex, { paddingBottom: insets.bottom + Spacing.three }]}>
+          <RestView key={rest.id} seconds={rest.seconds} next={rest.next} onContinue={endRest} />
+        </View>
+      ) : (
+        <>
+          <ScrollView
+            key={index}
+            keyboardShouldPersistTaps="handled"
+            keyboardDismissMode="interactive"
+            automaticallyAdjustKeyboardInsets
+            showsVerticalScrollIndicator={false}
+            contentContainerStyle={styles.content}>
+            {exercise ? (
+              <View style={styles.exerciseHeader}>
+                {/* The animation has a white background, so it sits on white in dark mode too. */}
+                <View style={styles.mediaFrame}>
+                  <Image
+                    source={exercise.media.gif}
+                    placeholder={exercise.media.thumbnail}
+                    style={styles.media}
+                    contentFit="contain"
+                    autoplay
+                    accessibilityLabel={exercise.name[locale]}
+                    accessibilityIgnoresInvertColors
+                  />
+                </View>
+                <View style={styles.flex}>
+                  <Text style={styles.exerciseName} accessibilityRole="header">
+                    {exercise.name[locale]}
+                  </Text>
+                  <Text style={styles.target}>
+                    {t('session.target', { prescription: prescriptionLabel(planned) })}
+                  </Text>
+                  {last && last.length > 0 ? (
+                    <Text style={styles.meta}>
+                      {t('session.lastTime', { sets: formatSets(last, locale) })}
+                    </Text>
+                  ) : null}
+                </View>
+              </View>
+            ) : null}
+
+            {hitAllReps ? (
+              <View style={styles.hint}>
+                <Icon icon={icons.tips} size={20} color={theme.tint} />
+                <Text style={styles.hintText}>{t('session.tryHeavier')}</Text>
+              </View>
+            ) : null}
+
+            {currentSet ? (
+              <Card>
+                <View style={styles.setCard}>
+                  <Text style={styles.setTitle}>
+                    {t('session.setOf', { current: setIndex + 1, total: logged.sets.length })}
+                  </Text>
+                  <View style={styles.steppers}>
+                    <Stepper
+                      key={`weight-${logged.exerciseId}-${setIndex}`}
+                      label={t('session.weight')}
+                      value={currentSet.weightKg}
+                      onChange={(weightKg) => actions.updateSet(index, setIndex, { weightKg })}
+                      step={WEIGHT_STEP_KG}
+                      format={(value) => formatWeight(value, locale)}
+                    />
+                    <Stepper
+                      key={`reps-${logged.exerciseId}-${setIndex}`}
+                      label={t('session.reps')}
+                      value={currentSet.reps}
+                      onChange={(reps) => actions.updateSet(index, setIndex, { reps })}
+                      step={1}
+                      format={String}
+                      integer
+                    />
+                  </View>
+                </View>
+              </Card>
+            ) : (
+              <Text style={[styles.meta, styles.centered]}>{t('session.allSetsDone')}</Text>
+            )}
+
+            <Card>
+              <SetList
+                sets={logged.sets}
+                currentIndex={currentSet ? setIndex : null}
+                onEdit={(i) => actions.updateSet(index, i, { done: false })}
+              />
+            </Card>
+            <View style={styles.setActions}>
+              <View style={styles.flex}>
+                <Button
+                  variant="plain"
+                  icon={icons.addSet}
+                  label={t('session.addSet')}
+                  onPress={() => actions.addSet(index)}
                 />
               </View>
-            </Card>
-            <View style={styles.heading}>
-              <ThemedText type="title" accessibilityRole="header">
-                {exercise.name[locale]}
-              </ThemedText>
-              <Text style={styles.target}>
-                {t('session.target', { prescription: prescriptionLabel(planned) })}
-              </Text>
-              {last && last.length > 0 ? (
-                <Text style={styles.meta}>
-                  {t('session.lastTime', { sets: formatSets(last, locale) })}
-                </Text>
-              ) : null}
+              <View style={styles.flex}>
+                <Button
+                  variant="plain"
+                  icon={icons.removeSet}
+                  label={t('session.removeSet')}
+                  onPress={() => actions.removeSet(index)}
+                  disabled={!canRemoveSet}
+                />
+              </View>
             </View>
-          </>
-        ) : null}
+            {logged.sets.some((set) => set.done) ? (
+              <Text style={[styles.meta, styles.centered]}>{t('session.editHint')}</Text>
+            ) : null}
 
-        {hitAllReps ? (
-          <View style={styles.hint}>
-            <Icon icon={icons.tips} size={20} color={theme.tint} />
-            <Text style={styles.hintText}>{t('session.tryHeavier')}</Text>
+            <View style={styles.setActions}>
+              <View style={styles.flex}>
+                <Button
+                  variant="secondary"
+                  icon={icons.swap}
+                  label={t('session.swap')}
+                  onPress={() => setSwapping(true)}
+                  disabled={swapOptions.length === 0}
+                />
+              </View>
+              <View style={styles.flex}>
+                <Button
+                  variant="secondary"
+                  icon={icons.skip}
+                  label={t('session.skip')}
+                  onPress={skip}
+                />
+              </View>
+            </View>
+            <Button variant="plain" label={t('session.discard')} onPress={discard} />
+          </ScrollView>
+
+          <View style={[styles.footer, { paddingBottom: insets.bottom + Spacing.three }]}>
+            {currentSet ? (
+              <Button icon={icons.setDone} label={t('session.setDone')} onPress={setDone} />
+            ) : (
+              <Button
+                icon={isLastExercise ? icons.setDone : icons.chevronRight}
+                label={isLastExercise ? t('session.finish') : t('session.next')}
+                onPress={nextExercise}
+              />
+            )}
           </View>
-        ) : null}
-
-        {logged.status === 'skipped' ? (
-          <Text style={[styles.meta, styles.centered]}>{t('session.skipped')}</Text>
-        ) : null}
-
-        <Card>
-          <SetHeader />
-          {logged.sets.map((set, setIndex) => (
-            <SetRow
-              key={`${logged.exerciseId}-${setIndex}`}
-              number={setIndex + 1}
-              set={set}
-              repsPlaceholder={repsPlaceholder}
-              onChange={(patch) => actions.updateSet(index, setIndex, patch)}
-              onToggleDone={() => toggleSet(setIndex)}
-              last={setIndex === logged.sets.length - 1}
-            />
-          ))}
-        </Card>
-        <Button
-          variant="plain"
-          icon={icons.addSet}
-          label={t('session.addSet')}
-          onPress={() => actions.addSet(index)}
-        />
-
-        <View style={styles.secondaryActions}>
-          <View style={styles.flex}>
-            <Button
-              variant="secondary"
-              icon={icons.swap}
-              label={t('session.swap')}
-              onPress={() => setSwapping(true)}
-              disabled={swapOptions.length === 0}
-            />
-          </View>
-          <View style={styles.flex}>
-            <Button
-              variant="secondary"
-              icon={icons.skip}
-              label={t('session.skip')}
-              onPress={skip}
-            />
-          </View>
-        </View>
-        <Button variant="plain" label={t('session.discard')} onPress={discard} />
-      </ScrollView>
-
-      <View style={[styles.footer, { paddingBottom: insets.bottom + Spacing.three }]}>
-        {rest ? <RestTimer key={rest.id} seconds={rest.seconds} onDone={endRest} /> : null}
-        <Button
-          label={isLast ? t('session.finish') : t('session.next')}
-          icon={isLast ? icons.setDone : icons.chevronRight}
-          onPress={next}
-        />
-      </View>
+        </>
+      )}
 
       <SwapSheet
         visible={swapping}
         options={swapOptions}
         onClose={() => setSwapping(false)}
         onSelect={(exerciseId) => {
-          actions.swapExercise(index, exerciseId);
+          actions.swapExercise(index, exerciseId, planned.reps.max);
           setSwapping(false);
         }}
       />
@@ -411,6 +487,8 @@ function WorkoutSummary({ session }: { session: WorkoutSession }) {
     </Screen>
   );
 }
+
+const MEDIA_SIZE = 96;
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -478,27 +556,33 @@ const useStyles = makeStyles((theme) => ({
   content: {
     gap: Spacing.four,
     paddingHorizontal: Spacing.four,
-    paddingTop: Spacing.two,
+    paddingTop: Spacing.three,
     paddingBottom: Spacing.six,
   },
-  mediaCard: {
-    backgroundColor: '#FFFFFF',
+  exerciseHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.four,
   },
   mediaFrame: {
-    alignItems: 'center',
+    width: MEDIA_SIZE,
+    height: MEDIA_SIZE,
+    borderRadius: Radius.medium,
     backgroundColor: '#FFFFFF',
-    paddingVertical: Spacing.two,
+    overflow: 'hidden',
   },
   media: {
-    width: 180,
-    height: 180,
+    width: '100%',
+    height: '100%',
   },
-  heading: {
-    gap: Spacing.one,
-    paddingHorizontal: Spacing.one,
+  exerciseName: {
+    fontSize: 22,
+    fontWeight: 600,
+    color: theme.heading,
   },
   target: {
-    fontSize: 15,
+    marginTop: Spacing.one,
+    fontSize: 14,
     fontWeight: 600,
     color: theme.tint,
   },
@@ -523,12 +607,25 @@ const useStyles = makeStyles((theme) => ({
     lineHeight: 20,
     color: theme.text,
   },
-  secondaryActions: {
+  setCard: {
+    gap: Spacing.four,
+    padding: Spacing.four,
+  },
+  setTitle: {
+    fontSize: 20,
+    fontWeight: 700,
+    textAlign: 'center',
+    color: theme.text,
+  },
+  steppers: {
+    flexDirection: 'row',
+    gap: Spacing.four,
+  },
+  setActions: {
     flexDirection: 'row',
     gap: Spacing.three,
   },
   footer: {
-    gap: Spacing.three,
     paddingHorizontal: Spacing.four,
     paddingTop: Spacing.three,
     backgroundColor: theme.background,

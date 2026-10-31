@@ -48,7 +48,11 @@ export function Button({
           <Icon icon={icon} size={20} color={color} strokeWidth={2} />
         </View>
       ) : null}
-      <Text style={[styles.label, { color }]}>{label}</Text>
+      <Text
+        numberOfLines={1}
+        style={[styles.label, variant === 'plain' && styles.plainLabel, { color }]}>
+        {label}
+      </Text>
     </Pressable>
   );
 }
@@ -79,7 +83,11 @@ const useStyles = makeStyles((theme) => ({
     opacity: 0.8,
   },
   label: {
+    flexShrink: 1,
     fontSize: 17,
     fontWeight: 600,
+  },
+  plainLabel: {
+    fontSize: 15,
   },
 }));
