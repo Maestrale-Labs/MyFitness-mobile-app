@@ -207,6 +207,7 @@ function ActivePlan({ plan, plans }: { plan: WorkoutPlan; plans: WorkoutPlan[] }
 
 function RecentWorkouts({ plans }: { plans: WorkoutPlan[] }) {
   const styles = useStyles();
+  const theme = useTheme();
   const locale = useLocale();
   const { t } = useTranslation();
   const history = useTraining((state) => state.history);
@@ -218,14 +219,7 @@ function RecentWorkouts({ plans }: { plans: WorkoutPlan[] }) {
 
   return (
     <>
-      <View style={styles.sectionHeader}>
-        <View style={styles.flex}>
-          <SectionLabel>{t('home.recent')}</SectionLabel>
-        </View>
-        <View style={styles.sectionArrow}>
-          <ArrowLink label={t('home.allWorkouts')} onPress={() => router.push('/history')} />
-        </View>
-      </View>
+      <SectionLabel>{t('home.recent')}</SectionLabel>
       <Card>
         {recent.map((session, index) => {
           const plan = plans.find((item) => item.id === session.planId);
@@ -242,7 +236,7 @@ function RecentWorkouts({ plans }: { plans: WorkoutPlan[] }) {
               }
               style={({ pressed }) => [
                 styles.recentRow,
-                index < recent.length - 1 && styles.divider,
+                styles.divider,
                 pressed && styles.pressed,
               ]}>
               <View style={styles.flex}>
@@ -263,6 +257,15 @@ function RecentWorkouts({ plans }: { plans: WorkoutPlan[] }) {
             </Pressable>
           );
         })}
+        <Pressable
+          accessibilityRole="link"
+          onPress={() => router.push('/history')}
+          style={({ pressed }) => [styles.recentRow, pressed && styles.pressed]}>
+          <Text style={[styles.flex, styles.seeAll]}>
+            {t('home.allWorkouts', { count: history.length })}
+          </Text>
+          <Icon icon={icons.chevronRight} size={18} color={theme.tint} strokeWidth={2} />
+        </Pressable>
       </Card>
     </>
   );
@@ -285,15 +288,6 @@ function ArrowLink({ label, onPress }: { label: string; onPress: () => void }) {
 }
 
 const useStyles = makeStyles((theme) => ({
-  // Lines the arrow up with the section label, which has its own top and bottom margins.
-  sectionHeader: {
-    flexDirection: 'row',
-    alignItems: 'flex-end',
-    marginBottom: -Spacing.two,
-  },
-  sectionArrow: {
-    marginBottom: -Spacing.four,
-  },
   arrow: {
     width: 32,
     height: 32,
@@ -411,6 +405,11 @@ const useStyles = makeStyles((theme) => ({
     gap: Spacing.three,
     paddingHorizontal: Spacing.four,
     paddingVertical: 14,
+  },
+  seeAll: {
+    fontSize: 16,
+    fontWeight: 600,
+    color: theme.tint,
   },
   recentTitle: {
     fontSize: 16,

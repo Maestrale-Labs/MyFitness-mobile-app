@@ -96,7 +96,7 @@ export const it = {
     recent: 'Ultimi allenamenti',
     thisWeek: 'Questa settimana',
     openCalendar: 'Apri il calendario',
-    allWorkouts: 'Vedi tutti gli allenamenti',
+    allWorkouts: 'Vedi tutti ({{count}})',
     weekCount: '{{done}} di {{total}} allenamenti',
     dayShort: 'G{{number}}',
     rest: 'Riposo',

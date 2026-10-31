@@ -96,7 +96,7 @@ export const en: Translations = {
     recent: 'Recent workouts',
     thisWeek: 'This week',
     openCalendar: 'Open the calendar',
-    allWorkouts: 'See all workouts',
+    allWorkouts: 'See all ({{count}})',
     weekCount: '{{done}} of {{total}} workouts',
     dayShort: 'D{{number}}',
     rest: 'Rest',
