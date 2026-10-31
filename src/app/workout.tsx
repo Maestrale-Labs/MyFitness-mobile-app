@@ -1,8 +1,7 @@
-import { Image } from 'expo-image';
 import { router } from 'expo-router';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Keyboard, Pressable, ScrollView, Text, View } from 'react-native';
+import { Keyboard, Pressable, ScrollView, Text, View, type ScrollViewInstance } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { Button } from '@/components/button';
@@ -14,7 +13,7 @@ import { icons } from '@/constants/icons';
 import { Radius, Spacing } from '@/constants/theme';
 import { useExercises } from '@/features/exercises/queries';
 import type { Exercise } from '@/features/exercises/types';
-import { ExerciseStrip } from '@/features/training/components/exercise-strip';
+import { ExerciseCard } from '@/features/training/components/exercise-card';
 import { SetTable } from '@/features/training/components/set-table';
 import { formatSets, formatWeight, sessionTotals } from '@/features/training/format';
 import { lastSetsFor, useTraining } from '@/features/training/store';
@@ -40,10 +39,10 @@ function leaveWorkout() {
 }
 
 /**
- * The workout being done. The day's exercises are in a strip at the top; the selected
- * one shows its sets, to fill in and tick. Ticking the last set of an exercise moves to
- * the next one, and ticking the last set of the day ends the workout. Everything is
- * saved as it changes, so leaving and coming back resumes where it was.
+ * The workout being done: the day's exercises as an accordion, the open one showing its
+ * sets to fill in and tick. Ticking the last set of an exercise closes it and opens the
+ * next; ticking the last set of the day ends the workout. Everything is saved as it
+ * changes, so leaving and coming back resumes where it was.
  */
 export default function WorkoutScreen() {
   const current = useTraining((state) => state.current);
@@ -85,13 +84,14 @@ function ActiveWorkout({ session, plan, exercises, onFinish }: ActiveWorkoutProp
   const prescriptionLabel = usePrescriptionLabel();
   const history = useTraining((state) => state.history);
   const actions = useTraining.getState();
+  const scroll = useRef<ScrollViewInstance>(null);
+  // Where each card starts in the list, to bring the next exercise into view.
+  const cardOffsets = useRef<number[]>([]);
 
-  const [selected, setSelected] = useState(() =>
-    Math.max(
-      0,
-      session.exercises.findIndex((exercise) => exercise.status !== 'done'),
-    ),
-  );
+  const [expanded, setExpanded] = useState<number | null>(() => {
+    const first = session.exercises.findIndex((exercise) => exercise.status !== 'done');
+    return first === -1 ? null : first;
+  });
 
   const exercisesById = useMemo(
     () => new Map(exercises.map((exercise) => [exercise.id, exercise])),
@@ -99,15 +99,26 @@ function ActiveWorkout({ session, plan, exercises, onFinish }: ActiveWorkoutProp
   );
 
   const day = plan.days[session.dayIndex] ?? plan.days[0];
-  const logged = session.exercises[selected];
-  const planned =
-    day.exercises.find((item) => item.exerciseId === logged.plannedExerciseId) ??
-    day.exercises[selected];
-  const exercise = exercisesById.get(logged.exerciseId);
-  const last = lastSetsFor(history, logged.exerciseId);
-  const hitAllReps =
-    last !== null && last.length > 0 && last.every((set) => (set.reps ?? 0) >= planned.reps.max);
   const doneCount = session.exercises.filter((item) => item.status === 'done').length;
+
+  function plannedFor(exerciseIndex: number) {
+    const logged = session.exercises[exerciseIndex];
+    return (
+      day.exercises.find((item) => item.exerciseId === logged.plannedExerciseId) ??
+      day.exercises[exerciseIndex]
+    );
+  }
+
+  function open(exerciseIndex: number) {
+    setExpanded(exerciseIndex);
+    // Wait for the previous card to close, then scroll to the opened one.
+    setTimeout(() => {
+      scroll.current?.scrollTo({
+        y: Math.max(0, (cardOffsets.current[exerciseIndex] ?? 0) - Spacing.two),
+        animated: true,
+      });
+    }, 50);
+  }
 
   function save(saved: WorkoutSession | null) {
     // With nothing ticked the workout is dropped: no summary, and the screen closes itself.
@@ -116,8 +127,9 @@ function ActiveWorkout({ session, plan, exercises, onFinish }: ActiveWorkoutProp
     }
   }
 
-  function toggleSet(setIndex: number) {
-    const exerciseIndex = selected;
+  function toggleSet(exerciseIndex: number, setIndex: number) {
+    const logged = session.exercises[exerciseIndex];
+    const planned = plannedFor(exerciseIndex);
     const set = logged.sets[setIndex];
     if (set.done) {
       actions.updateSet(exerciseIndex, setIndex, { done: false });
@@ -153,7 +165,7 @@ function ActiveWorkout({ session, plan, exercises, onFinish }: ActiveWorkoutProp
       if (next === undefined) {
         save(actions.finishWorkout(plan));
       } else {
-        setSelected(next);
+        open(next);
       }
     }, ADVANCE_DELAY_MS);
   }
@@ -210,64 +222,56 @@ function ActiveWorkout({ session, plan, exercises, onFinish }: ActiveWorkoutProp
         </Pressable>
       </View>
 
-      <ExerciseStrip
-        exercises={session.exercises}
-        exercisesById={exercisesById}
-        selected={selected}
-        onSelect={setSelected}
-      />
-
       <ScrollView
+        ref={scroll}
         keyboardShouldPersistTaps="handled"
         keyboardDismissMode="interactive"
         automaticallyAdjustKeyboardInsets
         showsVerticalScrollIndicator={false}
         contentContainerStyle={[styles.content, { paddingBottom: insets.bottom + Spacing.six }]}>
-        {exercise ? (
-          <View style={styles.exerciseHeader}>
-            {/* The animation has a white background, so it sits on white in dark mode too. */}
-            <View style={styles.mediaFrame}>
-              <Image
-                source={exercise.media.gif}
-                placeholder={exercise.media.thumbnail}
-                style={styles.media}
-                contentFit="contain"
-                autoplay
-                accessibilityLabel={exercise.name[locale]}
-                accessibilityIgnoresInvertColors
-              />
+        {session.exercises.map((logged, exerciseIndex) => {
+          const planned = plannedFor(exerciseIndex);
+          const last = lastSetsFor(history, logged.exerciseId);
+          const hitAllReps =
+            last !== null &&
+            last.length > 0 &&
+            last.every((set) => (set.reps ?? 0) >= planned.reps.max);
+          return (
+            <View
+              key={exerciseIndex}
+              onLayout={(event) => {
+                cardOffsets.current[exerciseIndex] = event.nativeEvent.layout.y;
+              }}>
+              <ExerciseCard
+                number={exerciseIndex + 1}
+                logged={logged}
+                exercise={exercisesById.get(logged.exerciseId)}
+                target={t('session.target', { prescription: prescriptionLabel(planned) })}
+                expanded={expanded === exerciseIndex}
+                onToggle={() =>
+                  expanded === exerciseIndex ? setExpanded(null) : open(exerciseIndex)
+                }>
+                {last && last.length > 0 ? (
+                  <Text style={styles.lastTime}>
+                    {t('session.lastTime', { sets: formatSets(last, locale) })}
+                  </Text>
+                ) : null}
+                {hitAllReps ? (
+                  <View style={styles.hint}>
+                    <Icon icon={icons.tips} size={20} color={theme.tint} />
+                    <Text style={styles.hintText}>{t('session.tryHeavier')}</Text>
+                  </View>
+                ) : null}
+                <SetTable
+                  key={logged.exerciseId}
+                  sets={logged.sets}
+                  onChange={(setIndex, patch) => actions.updateSet(exerciseIndex, setIndex, patch)}
+                  onToggle={(setIndex) => toggleSet(exerciseIndex, setIndex)}
+                />
+              </ExerciseCard>
             </View>
-            <View style={styles.flex}>
-              <Text style={styles.exerciseName} accessibilityRole="header">
-                {exercise.name[locale]}
-              </Text>
-              <Text style={styles.target}>
-                {t('session.target', { prescription: prescriptionLabel(planned) })}
-              </Text>
-              {last && last.length > 0 ? (
-                <Text style={styles.meta}>
-                  {t('session.lastTime', { sets: formatSets(last, locale) })}
-                </Text>
-              ) : null}
-            </View>
-          </View>
-        ) : null}
-
-        {hitAllReps ? (
-          <View style={styles.hint}>
-            <Icon icon={icons.tips} size={20} color={theme.tint} />
-            <Text style={styles.hintText}>{t('session.tryHeavier')}</Text>
-          </View>
-        ) : null}
-
-        <Card>
-          <SetTable
-            key={`${selected}-${logged.exerciseId}`}
-            sets={logged.sets}
-            onChange={(setIndex, patch) => actions.updateSet(selected, setIndex, patch)}
-            onToggle={toggleSet}
-          />
-        </Card>
+          );
+        })}
       </ScrollView>
     </View>
   );
@@ -309,8 +313,6 @@ function WorkoutSummary({ session }: { session: WorkoutSession }) {
     </Screen>
   );
 }
-
-const MEDIA_SIZE = 96;
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -357,48 +359,20 @@ const useStyles = makeStyles((theme) => ({
     color: theme.tint,
   },
   content: {
-    gap: Spacing.four,
+    gap: Spacing.three,
     paddingHorizontal: Spacing.four,
     paddingTop: Spacing.two,
   },
-  exerciseHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: Spacing.four,
-  },
-  mediaFrame: {
-    width: MEDIA_SIZE,
-    height: MEDIA_SIZE,
-    borderRadius: Radius.medium,
-    backgroundColor: '#FFFFFF',
-    overflow: 'hidden',
-  },
-  media: {
-    width: '100%',
-    height: '100%',
-  },
-  exerciseName: {
-    fontSize: 22,
-    fontWeight: 600,
-    color: theme.heading,
-  },
-  target: {
-    marginTop: Spacing.one,
-    fontSize: 14,
-    fontWeight: 600,
-    color: theme.tint,
-  },
-  meta: {
+  lastTime: {
+    paddingHorizontal: Spacing.four,
     fontSize: 14,
     color: theme.textSecondary,
-  },
-  centered: {
-    textAlign: 'center',
   },
   hint: {
     flexDirection: 'row',
     gap: Spacing.two,
     alignItems: 'center',
+    marginHorizontal: Spacing.three,
     padding: Spacing.three,
     borderRadius: Radius.medium,
     backgroundColor: theme.brandSoft,
@@ -408,6 +382,9 @@ const useStyles = makeStyles((theme) => ({
     fontSize: 14,
     lineHeight: 20,
     color: theme.text,
+  },
+  centered: {
+    textAlign: 'center',
   },
   summary: {
     flex: 1,

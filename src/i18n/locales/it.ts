@@ -107,6 +107,7 @@ export const it = {
     reps: 'Rip.',
     markDone: 'Segna la serie {{number}} come fatta',
     exerciseDone: '{{name}}, fatto',
+    setsDone: '{{done}}/{{total}} serie',
     end: 'Termina',
     close: 'Chiudi allenamento',
     exitTitle: 'Uscire dall’allenamento?',

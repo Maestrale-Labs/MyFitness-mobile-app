@@ -107,6 +107,7 @@ export const en: Translations = {
     reps: 'Reps',
     markDone: 'Mark set {{number}} as done',
     exerciseDone: '{{name}}, done',
+    setsDone: '{{done}}/{{total}} sets',
     end: 'Finish',
     close: 'Close workout',
     exitTitle: 'Leave the workout?',

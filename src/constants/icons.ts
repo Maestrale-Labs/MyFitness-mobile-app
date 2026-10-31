@@ -2,6 +2,7 @@
 // Stroke Rounded style, as in Paniere. Icons are picked here only, so swapping one
 // never touches the screens.
 import {
+  ArrowDown01Icon,
   ArrowLeft01Icon,
   ArrowRight01Icon,
   Award01Icon,
@@ -45,6 +46,7 @@ export const icons = {
   // navigation
   back: ArrowLeft01Icon,
   chevronRight: ArrowRight01Icon,
+  chevronDown: ArrowDown01Icon,
   close: Cancel01Icon,
   // choices
   checked: CheckmarkCircle02Icon,
