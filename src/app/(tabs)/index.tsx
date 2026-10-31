@@ -11,7 +11,7 @@ import { ThemedText } from '@/components/themed-text';
 import { icons } from '@/constants/icons';
 import { Radius, Spacing } from '@/constants/theme';
 import { useSettings } from '@/features/settings/store';
-import { planWeek, weekCalendar } from '@/features/training/calendar';
+import { formatWeekMonths, planWeek, weekCalendar } from '@/features/training/calendar';
 import { WeekCalendar } from '@/features/training/components/week-calendar';
 import { completedWorkouts, useTraining } from '@/features/training/store';
 import { useWorkoutPlans } from '@/features/workouts/queries';
@@ -132,6 +132,22 @@ function ActivePlan({ plan, plans }: { plan: WorkoutPlan; plans: WorkoutPlan[] }
       <SectionLabel>{t('home.thisWeek')}</SectionLabel>
       <Card>
         <View style={styles.weekCard}>
+          <View style={styles.row}>
+            <Text style={[styles.flex, styles.monthLabel]}>
+              {formatWeekMonths(
+                days.map((item) => item.date),
+                locale,
+              )}
+            </Text>
+            <View>
+              <Button
+                variant="plain"
+                label={t('home.calendarLink')}
+                icon={icons.chevronRight}
+                onPress={() => router.push('/calendar')}
+              />
+            </View>
+          </View>
           <WeekCalendar days={days} />
           <Text style={[styles.meta, styles.centered]}>
             {t('home.weekCount', { done: doneThisWeek, total: plan.daysPerWeek })}
@@ -274,6 +290,12 @@ const useStyles = makeStyles((theme) => ({
   weekCard: {
     gap: Spacing.two,
     padding: Spacing.three,
+  },
+  monthLabel: {
+    paddingLeft: Spacing.one,
+    fontSize: 16,
+    fontWeight: 600,
+    color: theme.text,
   },
   planCard: {
     gap: Spacing.three,

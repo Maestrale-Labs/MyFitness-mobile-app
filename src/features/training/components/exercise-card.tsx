@@ -80,16 +80,6 @@ export function ExerciseCard({
               ? target
               : t('session.setsDone', { done: setsDone, total: logged.sets.length })}
           </Text>
-          {expanded ? (
-            <Pressable
-              accessibilityRole="button"
-              onPress={onShowHowTo}
-              hitSlop={8}
-              style={({ pressed }) => [styles.howTo, pressed && styles.howToPressed]}>
-              <Icon icon={icons.info} size={16} color={theme.tint} strokeWidth={2} />
-              <Text style={styles.howToText}>{t('session.howTo')}</Text>
-            </Pressable>
-          ) : null}
         </View>
         {done ? (
           <View style={styles.doneBadge}>
@@ -101,7 +91,20 @@ export function ExerciseCard({
           </View>
         )}
       </Pressable>
-      {expanded ? <View style={styles.body}>{children}</View> : null}
+      {expanded ? (
+        <View style={styles.body}>
+          {/* Outside the header: a button can't sit inside another one. */}
+          <Pressable
+            accessibilityRole="button"
+            onPress={onShowHowTo}
+            hitSlop={8}
+            style={({ pressed }) => [styles.howTo, pressed && styles.howToPressed]}>
+            <Icon icon={icons.info} size={16} color={theme.tint} strokeWidth={2} />
+            <Text style={styles.howToText}>{t('session.howTo')}</Text>
+          </Pressable>
+          {children}
+        </View>
+      ) : null}
     </Card>
   );
 }
@@ -162,7 +165,7 @@ const useStyles = makeStyles((theme) => ({
     alignItems: 'center',
     alignSelf: 'flex-start',
     gap: Spacing.one,
-    marginTop: Spacing.two,
+    marginLeft: Spacing.three,
     paddingHorizontal: Spacing.three,
     paddingVertical: 6,
     borderRadius: Radius.pill,

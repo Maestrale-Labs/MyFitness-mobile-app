@@ -4,6 +4,14 @@ import type { ActivePlan, WorkoutSession } from './types';
 
 const DAY_MS = 24 * 60 * 60 * 1000;
 
+/** Whether a finished workout belongs to the plan being followed, done since it was chosen. */
+export function countsForPlan(session: WorkoutSession, activePlan: ActivePlan) {
+  return (
+    session.planId === activePlan.planId &&
+    startOfDay(new Date(session.startedAt)) >= startOfDay(new Date(activePlan.startedAt))
+  );
+}
+
 /** Local midnight of the given moment. */
 export function startOfDay(date: Date) {
   return new Date(date.getFullYear(), date.getMonth(), date.getDate());
@@ -20,7 +28,7 @@ export function addDays(date: Date, days: number) {
   return new Date(date.getFullYear(), date.getMonth(), date.getDate() + days);
 }
 
-function sameDay(a: Date, b: Date) {
+export function sameDay(a: Date, b: Date) {
   return (
     a.getFullYear() === b.getFullYear() &&
     a.getMonth() === b.getMonth() &&
@@ -63,9 +71,7 @@ export function weekCalendar(
   const monday = startOfWeek(today);
   const todayStart = startOfDay(today);
   const planStart = startOfDay(new Date(activePlan.startedAt));
-  const sessions = history.filter(
-    (session) => session.planId === plan.id && session.startedAt >= activePlan.startedAt,
-  );
+  const sessions = history.filter((session) => countsForPlan(session, activePlan));
   const inProgressToday = current?.planId === plan.id ? current : null;
   // Workouts still to place: the open one first (it's today's), then the next ones.
   let nextIndex = inProgressToday
@@ -97,4 +103,33 @@ export function weekCalendar(
     nextIndex = (nextIndex + 1) % plan.days.length;
     return { date, isToday, status: 'planned', dayIndex };
   });
+}
+
+/** The weeks of a month, Monday first; days outside the month are null. */
+export function monthGrid(month: Date): (Date | null)[][] {
+  const first = new Date(month.getFullYear(), month.getMonth(), 1);
+  const last = new Date(month.getFullYear(), month.getMonth() + 1, 0);
+  const weeks: (Date | null)[][] = [];
+  for (let start = startOfWeek(first); start <= last; start = addDays(start, 7)) {
+    weeks.push(
+      Array.from({ length: 7 }, (_, i) => {
+        const date = addDays(start, i);
+        return date.getMonth() === first.getMonth() ? date : null;
+      }),
+    );
+  }
+  return weeks;
+}
+
+/** "Ottobre 2026", or "Ottobre – Novembre 2026" when the week spans two months. */
+export function formatWeekMonths(days: Date[], locale: string) {
+  const first = days[0];
+  const last = days[days.length - 1];
+  const month = (date: Date) => {
+    const name = date.toLocaleDateString(locale, { month: 'long' });
+    return name.charAt(0).toUpperCase() + name.slice(1);
+  };
+  return first.getMonth() === last.getMonth()
+    ? `${month(first)} ${first.getFullYear()}`
+    : `${month(first)} – ${month(last)} ${last.getFullYear()}`;
 }

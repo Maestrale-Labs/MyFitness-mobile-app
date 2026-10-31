@@ -72,6 +72,7 @@ export default function RootLayout() {
             name="workout"
             options={{ presentation: 'fullScreenModal', gestureEnabled: false }}
           />
+          <Stack.Screen name="calendar" />
           <Stack.Screen name="profile/name" />
           <Stack.Screen name="profile/theme" />
           <Stack.Screen name="profile/language" />

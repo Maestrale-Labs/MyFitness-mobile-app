@@ -31,4 +31,9 @@ export type WorkoutSession = {
   startedAt: string;
   finishedAt: string | null;
   exercises: LoggedExercise[];
+  /**
+   * Logged afterwards for a past day the user forgot to record: its dates are that day,
+   * not the moment it was typed in.
+   */
+  loggedLater?: boolean;
 };

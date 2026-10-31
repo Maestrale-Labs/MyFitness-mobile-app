@@ -213,7 +213,15 @@ function ActiveWorkout({ session, plan, exercises, onFinish }: ActiveWorkoutProp
             {t('plan.day', { number: session.dayIndex + 1 })}
           </Text>
           <Text style={styles.topSubtitle} numberOfLines={1}>
-            {t('session.exercisesDone', { done: doneCount, total: session.exercises.length })}
+            {session.loggedLater
+              ? t('session.loggedFor', {
+                  date: new Date(session.startedAt).toLocaleDateString(locale, {
+                    weekday: 'long',
+                    day: 'numeric',
+                    month: 'long',
+                  }),
+                })
+              : t('session.exercisesDone', { done: doneCount, total: session.exercises.length })}
           </Text>
         </View>
         <Pressable

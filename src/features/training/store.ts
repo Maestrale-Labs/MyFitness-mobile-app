@@ -7,17 +7,22 @@ import { createJSONStorage, persist } from 'zustand/middleware';
 import { track } from '@/features/analytics/client';
 import type { WorkoutPlan } from '@/features/workouts/types';
 
+import { countsForPlan } from './calendar';
 import type { ActivePlan, LoggedExercise, LoggedSet, WorkoutSession } from './types';
 
 type TrainingState = {
   activePlan: ActivePlan | null;
   /** The workout being done right now, kept across app restarts. */
   current: WorkoutSession | null;
-  /** Finished workouts, oldest first. */
+  /** Finished workouts, oldest first (by the day they were done). */
   history: WorkoutSession[];
   assignPlan: (plan: WorkoutPlan) => void;
   leavePlan: () => void;
-  startWorkout: (plan: WorkoutPlan) => void;
+  /**
+   * Opens the plan's next workout. With `loggedFor`, it's a workout done on that past day
+   * and forgotten: it's saved with that date.
+   */
+  startWorkout: (plan: WorkoutPlan, loggedFor?: Date) => void;
   updateSet: (exerciseIndex: number, setIndex: number, patch: Partial<LoggedSet>) => void;
   setExerciseStatus: (exerciseIndex: number, status: LoggedExercise['status']) => void;
   /**
@@ -47,9 +52,7 @@ export function completedWorkouts(state: Pick<TrainingState, 'activePlan' | 'his
   if (!activePlan) {
     return 0;
   }
-  return history.filter(
-    (session) => session.planId === activePlan.planId && session.startedAt >= activePlan.startedAt,
-  ).length;
+  return history.filter((session) => countsForPlan(session, activePlan)).length;
 }
 
 /**
@@ -112,7 +115,7 @@ export const useTraining = create<TrainingState>()(
 
       leavePlan: () => set({ activePlan: null, current: null }),
 
-      startWorkout: (plan) => {
+      startWorkout: (plan, loggedFor) => {
         const { activePlan, history, current } = get();
         if (current) {
           return;
@@ -124,8 +127,13 @@ export const useTraining = create<TrainingState>()(
             id: randomUUID(),
             planId: plan.id,
             dayIndex,
-            startedAt: new Date().toISOString(),
+            // A forgotten workout is dated midday of its day, clear of time-zone edges.
+            startedAt: (loggedFor
+              ? new Date(loggedFor.getFullYear(), loggedFor.getMonth(), loggedFor.getDate(), 12)
+              : new Date()
+            ).toISOString(),
             finishedAt: null,
+            ...(loggedFor ? { loggedLater: true } : {}),
             exercises: day.exercises.map((item) => ({
               exerciseId: item.exerciseId,
               plannedExerciseId: item.exerciseId,
@@ -163,7 +171,7 @@ export const useTraining = create<TrainingState>()(
         }
         const finished: WorkoutSession = {
           ...current,
-          finishedAt: new Date().toISOString(),
+          finishedAt: current.loggedLater ? current.startedAt : new Date().toISOString(),
           // Exercises never opened count as skipped; sets not ticked are dropped.
           exercises: current.exercises.map((exercise) => {
             const sets = exercise.sets.filter((item) => item.done);
@@ -175,9 +183,13 @@ export const useTraining = create<TrainingState>()(
           activePlan?.planId === plan.id
             ? { ...activePlan, nextDayIndex: (current.dayIndex + 1) % plan.days.length }
             : activePlan;
-        set({ current: null, history: [...history, finished], activePlan: nextActive });
+        // Kept in day order, so a forgotten workout logged now sits where it belongs.
+        const nextHistory = [...history, finished].sort((a, b) =>
+          (a.finishedAt ?? '').localeCompare(b.finishedAt ?? ''),
+        );
+        set({ current: null, history: nextHistory, activePlan: nextActive });
 
-        const done = completedWorkouts({ activePlan: nextActive, history: [...history, finished] });
+        const done = completedWorkouts({ activePlan: nextActive, history: nextHistory });
         track('workout_completed', {
           planId: plan.id,
           day: current.dayIndex + 1,
