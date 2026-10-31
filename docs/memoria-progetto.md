@@ -10,10 +10,10 @@ Ultimo aggiornamento: 30 ottobre 2026.
 - C'è una terza tab, **Schede** (prima si chiamava «Allenamenti», con il titolo «I miei allenamenti»), che è la prima della barra e quella che si apre all'avvio, con le prime 2 schede preimpostate per principianti (vedi «Schede di allenamento»). Per ora si consultano e basta: non si salva ancora nulla.
 - Valerio ha visto il primo risultato e la UI non lo convinceva, a partire dalla barra di navigazione in basso. **La UI è stata rifatta con lo stile di Paniere** (30 ottobre 2026): barra a pillola flottante, card bianche, righe in stile impostazioni, icone Hugeicons. Va ancora vista da Valerio su un telefono.
 - Paniere non era raggiungibile dalla sessione cloud in cui è nata l'app (vedi «Paniere» più sotto). Ora è in locale in `../paniere-mobile-app`.
-- L'app è collegata al progetto Expo `@maestrale-lab/fitness` e ha il suo `eas.json` (vedi «Expo, EAS e App Store»).
+- L'app è collegata al progetto Expo `@maestrale-lab/maestralegym` e ha il suo `eas.json` (vedi «Expo, EAS e App Store»).
 - La tabella Supabase degli esercizi (`public.exercises`, con i 2 esercizi di prova) è **applicata al progetto** dal 30 ottobre 2026, ma l'app legge ancora gli esercizi dal codice. Nel codice gli esercizi sono 36 e c'è il campo `muscleGroup`: prima di far leggere il catalogo da Supabase serve una nuova migrazione che aggiunga la colonna e gli altri esercizi.
 - Ci sono le **statistiche anonime d'uso** (installazioni, utenti attivi, ritorni, eventi), inviate a Supabase senza account: vedi «Statistiche anonime» e `docs/analytics.md`. La migrazione `analytics` è **applicata** (30 ottobre 2026) e il primo evento di prova è arrivato.
-- Il repository GitHub è stato rinominato da `Maestrale-Labs/Fitness` a `Maestrale-Labs/MyFitness-mobile-app`.
+- Il repository GitHub è `Maestrale-Labs/MaestraleGym-mobile-app` (prima `Maestrale-Labs/Fitness`, poi `Maestrale-Labs/MyFitness-mobile-app`; GitHub reindirizza i vecchi indirizzi). La cartella sul computer di Valerio si chiama ancora `MyFitness-mobile-app`: si può rinominare a mano quando nessuna sessione ci sta lavorando.
 
 **Prossimi passi** (si parte da quello che si sblocca prima):
 
@@ -50,7 +50,7 @@ Riassunto della richiesta iniziale di Valerio (il testo integrale è in fondo):
 
 ### Supabase
 
-- **Il progetto c'è** (30 ottobre 2026): ref `xkczxrhdligtguxcoitq`, URL `https://xkczxrhdligtguxcoitq.supabase.co`. L'app non lo usa ancora: gli esercizi sono nel codice e le preferenze restano sul telefono. Servirà con le schede personalizzate e il diario, cioè quando servono account, dati legati all'utente (con regole RLS) e sincronizzazione. Il catalogo degli esercizi potrà essere pubblico in sola lettura. Il piano completo è in `docs/exercise-data.md`.
+- **Il progetto c'è** (30 ottobre 2026): nella dashboard si chiama ancora «MyFitnessApp», da rinominare in «MaestraleGym» in Settings › General (il nome è solo un'etichetta: ref, URL e chiavi non cambiano). Ref `xkczxrhdligtguxcoitq`, URL `https://xkczxrhdligtguxcoitq.supabase.co`. L'app non lo usa ancora: gli esercizi sono nel codice e le preferenze restano sul telefono. Servirà con le schede personalizzate e il diario, cioè quando servono account, dati legati all'utente (con regole RLS) e sincronizzazione. Il catalogo degli esercizi potrà essere pubblico in sola lettura. Il piano completo è in `docs/exercise-data.md`.
 - **Chiavi nell'app:** `.env` contiene solo `EXPO_PUBLIC_SUPABASE_URL` e `EXPO_PUBLIC_SUPABASE_KEY` (la chiave _publishable_, fatta apposta per stare nel client). È nel repository, così le build EAS la trovano.
 - **Cosa non va mai nel repository** (che è pubblico) né nell'app: la chiave _service role_, la password del database e il token personale `sbp_…`. Si tengono fuori dal codice e si passano alla CLI da terminale.
 - **CLI:** `supabase/` è stato creato con `supabase init`. Dal 30 ottobre 2026 la CLI sul computer di Valerio è **collegata** al progetto (`npx supabase link --project-ref xkczxrhdligtguxcoitq`, senza bisogno della password del database). Le migrazioni si applicano con `npx supabase db push --linked`.
@@ -107,10 +107,10 @@ Deciso con Valerio il 30 ottobre 2026:
 
 ### Expo, EAS e App Store
 
-- **Progetto Expo:** `@maestrale-lab/fitness` (ID `241313c9-8c78-4737-9433-4503049e33cc`), sotto l'organizzazione `maestrale-lab` come Paniere: https://expo.dev/accounts/maestrale-lab/projects/fitness.
+- **Progetto Expo:** `@maestrale-lab/maestralegym` (ID `4b6afaaf-2c23-460d-9fc7-7e0b84efe09c`), sotto l'organizzazione `maestrale-lab` come Paniere: https://expo.dev/accounts/maestrale-lab/projects/maestralegym. Il primo progetto, `@maestrale-lab/fitness`, era vuoto (nessuna build né pubblicazione) ed è stato sostituito il 31 ottobre 2026 per avere lo slug giusto; si può eliminare dalla dashboard di Expo.
 - **`eas.json`:** stessi profili di Paniere (`development`, `preview`, `production`), con il numero di build gestito da EAS. Il profilo `development` richiede `expo-dev-client`, che non è ancora installato: si aggiunge quando serve la prima development build.
 - **Sviluppo:** per ora basta Expo Go sull'iPhone, perché tutte le dipendenze sono incluse in Expo Go.
-- **App Store Connect:** il 31 ottobre 2026 Valerio registra l'App ID `com.maestralelabs.maestralegym` (team `537737V753`) con le capability **Push Notifications** e **Sign In with Apple**, e crea l'app «MaestraleGym» su App Store Connect (SKU `maestralegym`). Quando c'è il suo Apple ID numerico va messo in `eas.json` come `ascAppId`.
+- **App Store Connect:** il 31 ottobre 2026 Valerio registra l'App ID `com.maestralelabs.maestralegym` (team `537737V753`) con le capability **Push Notifications** e **Sign In with Apple**, e crea l'app «MaestraleGym» su App Store Connect (SKU `maestralegym`, Apple ID `6829209983`, già in `eas.json` come `ascAppId`).
 - **Bundle ID:** `com.maestralelabs.maestralegym`, sia iOS che Android (prima era `com.maestralelabs.fitness`, mai pubblicato).
 
 ### Il dataset degli esercizi
@@ -165,7 +165,7 @@ Decise il 30 ottobre 2026:
 ## Cosa fare adesso
 
 1. ~~Studiare Paniere~~ (fatto: vedi «Lo stile di Paniere»).
-2. ~~Rifare la UI di Fitness con lo stesso stile~~ (fatto il 30 ottobre 2026, provata nell'anteprima web).
+2. ~~Rifare la UI dell'app con lo stesso stile~~ (fatto il 30 ottobre 2026, provata nell'anteprima web).
 3. **Farla vedere a Valerio** sul telefono, accanto a Paniere, e correggere quello che non lo convince.
 4. **Supabase:**
    - applicare le migrazioni (`npx supabase db push`);
@@ -180,7 +180,7 @@ Decise il 30 ottobre 2026:
 
 ## Domande ancora aperte
 
-- **Nome dell'app:** deciso il 31 ottobre 2026: **MaestraleGym** (`name` in `app.json`). «MyFitnessApp» era già usato sull'App Store. Slug (`fitness`), progetto Expo e repository restano con i nomi di prima: sono identificativi interni. Icona e splash sono ancora quelli del template Expo.
+- **Nome dell'app:** deciso il 31 ottobre 2026: **MaestraleGym**, ovunque. «MyFitnessApp» era già usato sull'App Store. Nomi tecnici: slug e scheme `maestralegym`, bundle ID `com.maestralelabs.maestralegym`, pacchetto npm `maestralegym`, repository `MaestraleGym-mobile-app`. Icona e splash sono ancora quelli del template Expo.
 - **Animazioni:** per ora si tengono le **GIF originali** del dataset. Vanno a scatti già all'origine (il lat pulldown ha 12 fotogrammi a 180×180 px, con pause di 1 s), e ricalcarle o interpolarle senza licenza non si può. Il 30 ottobre 2026 è stato provato un prototipo nostro (una figura SVG animata in codice), ma a Valerio non è piaciuto («terribile») ed è stato tolto. Resta aperta la licenza Gym visual prima del rilascio.
 - **Testi legali** definitivi e URL della privacy policy.
 - **Progetto Supabase:** creato, con le migrazioni del catalogo pronte; ancora da collegare alla CLI, applicare e usare nell'app (vedi «Supabase»).
@@ -219,6 +219,7 @@ Decise il 30 ottobre 2026:
 12. **Statistiche anonime.** Valerio vuole sapere quante persone usano l'app senza obbligarle a registrarsi. Si decide: percorso salvato sul telefono, e un contatore anonimo su Supabase con installazioni, utenti attivi, ritorni ed eventi. Si collega la CLI di Supabase, si scrive la migrazione `analytics`, si aggiungono il tracciamento nell'app, l'interruttore nel profilo e i testi in privacy e termini.
 13. **Feedback.** Valerio chiede di poter ricevere feedback anche da chi non è registrato. Si aggiunge la pagina «Invia un feedback» nel profilo, con categoria e minimo 10 caratteri, senza limiti di invio, e la tabella `public.feedbacks` su Supabase (applicata e provata).
 14. **Nome: MaestraleGym.** «MyFitnessApp» è già preso sull'App Store; Valerio sceglie «MaestraleGym», registra l'App ID `com.maestralelabs.maestralegym` con notifiche push e Sign In with Apple, e crea l'app su App Store Connect.
+15. **MaestraleGym ovunque.** Valerio chiede di usare il nuovo nome dappertutto. Si rinominano il repository GitHub, il progetto Expo (nuovo `@maestrale-lab/maestralegym`), slug, scheme, pacchetto npm e la sessione di lavoro; l'Apple ID dell'app va in `eas.json`. Il nome del progetto Supabase va cambiato dalla dashboard (Settings › General).
 
 ### Richiesta iniziale (testo integrale)
 

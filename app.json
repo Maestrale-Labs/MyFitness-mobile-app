@@ -1,11 +1,11 @@
 {
   "expo": {
     "name": "MaestraleGym",
-    "slug": "fitness",
+    "slug": "maestralegym",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
-    "scheme": "fitness",
+    "scheme": "maestralegym",
     "userInterfaceStyle": "automatic",
     "ios": {
       "icon": "./assets/expo.icon",
@@ -53,7 +53,7 @@
     "owner": "maestrale-lab",
     "extra": {
       "eas": {
-        "projectId": "241313c9-8c78-4737-9433-4503049e33cc"
+        "projectId": "4b6afaaf-2c23-460d-9fc7-7e0b84efe09c"
       }
     }
   }
