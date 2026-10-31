@@ -108,6 +108,7 @@ export const it = {
     markDone: 'Segna la serie {{number}} come fatta',
     exerciseDone: '{{name}}, fatto',
     setsDone: '{{done}}/{{total}} serie',
+    howTo: 'Come si fa',
     end: 'Termina',
     close: 'Chiudi allenamento',
     exitTitle: 'Uscire dall’allenamento?',

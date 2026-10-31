@@ -22,6 +22,8 @@ type ExerciseCardProps = {
   target: string;
   expanded: boolean;
   onToggle: () => void;
+  /** Opens the explanation of how to do the exercise. */
+  onShowHowTo: () => void;
   /** The sets and hints, shown when expanded. */
   children: ReactNode;
 };
@@ -37,6 +39,7 @@ export function ExerciseCard({
   target,
   expanded,
   onToggle,
+  onShowHowTo,
   children,
 }: ExerciseCardProps) {
   const styles = useStyles();
@@ -77,6 +80,16 @@ export function ExerciseCard({
               ? target
               : t('session.setsDone', { done: setsDone, total: logged.sets.length })}
           </Text>
+          {expanded ? (
+            <Pressable
+              accessibilityRole="button"
+              onPress={onShowHowTo}
+              hitSlop={8}
+              style={({ pressed }) => [styles.howTo, pressed && styles.howToPressed]}>
+              <Icon icon={icons.info} size={16} color={theme.tint} strokeWidth={2} />
+              <Text style={styles.howToText}>{t('session.howTo')}</Text>
+            </Pressable>
+          ) : null}
         </View>
         {done ? (
           <View style={styles.doneBadge}>
@@ -143,6 +156,25 @@ const useStyles = makeStyles((theme) => ({
     fontSize: 13,
     fontWeight: 500,
     color: theme.textSecondary,
+  },
+  howTo: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    alignSelf: 'flex-start',
+    gap: Spacing.one,
+    marginTop: Spacing.two,
+    paddingHorizontal: Spacing.three,
+    paddingVertical: 6,
+    borderRadius: Radius.pill,
+    backgroundColor: theme.brandSoft,
+  },
+  howToPressed: {
+    opacity: 0.7,
+  },
+  howToText: {
+    fontSize: 13,
+    fontWeight: 600,
+    color: theme.tint,
   },
   doneBadge: {
     width: BADGE,

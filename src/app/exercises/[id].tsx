@@ -13,6 +13,7 @@ import { ThemedText } from '@/components/themed-text';
 import { icons } from '@/constants/icons';
 import { Spacing } from '@/constants/theme';
 import { track } from '@/features/analytics/client';
+import { ExerciseSteps } from '@/features/exercises/components/exercise-steps';
 import { useExercise } from '@/features/exercises/queries';
 import { makeStyles } from '@/hooks/use-styles';
 import { useTheme } from '@/hooks/use-theme';
@@ -113,16 +114,7 @@ export default function ExerciseDetailScreen() {
         </Card>
 
         <SectionLabel>{t('exerciseDetail.howTo')}</SectionLabel>
-        <Card>
-          {steps.map((step, index) => (
-            <View key={index} style={[styles.row, index < steps.length - 1 && styles.rowDivider]}>
-              <View style={styles.stepNumber}>
-                <Text style={styles.stepNumberText}>{index + 1}</Text>
-              </View>
-              <Text style={[styles.rowText, styles.stepText]}>{step}</Text>
-            </View>
-          ))}
-        </Card>
+        <ExerciseSteps steps={steps} />
 
         <ThemedText type="footnote" themeColor="textSecondary" style={styles.credit}>
           {t('exerciseDetail.mediaCredit', { credit: exercise.media.credit })}
@@ -183,25 +175,6 @@ const useStyles = makeStyles((theme) => ({
   },
   factValue: {
     fontSize: 16,
-    color: theme.text,
-  },
-  stepNumber: {
-    width: 28,
-    height: 28,
-    borderRadius: 14,
-    alignSelf: 'flex-start',
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: theme.brandSoft,
-  },
-  stepNumberText: {
-    fontSize: 14,
-    fontWeight: 700,
-    color: theme.tint,
-  },
-  stepText: {
-    fontSize: 16,
-    lineHeight: 22,
     color: theme.text,
   },
   credit: {

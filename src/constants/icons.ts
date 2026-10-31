@@ -48,6 +48,7 @@ export const icons = {
   chevronRight: ArrowRight01Icon,
   chevronDown: ArrowDown01Icon,
   close: Cancel01Icon,
+  info: InformationCircleIcon,
   // choices
   checked: CheckmarkCircle02Icon,
   unchecked: CircleIcon,

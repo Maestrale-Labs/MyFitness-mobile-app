@@ -13,6 +13,7 @@ import { icons } from '@/constants/icons';
 import { Radius, Spacing } from '@/constants/theme';
 import { useExercises } from '@/features/exercises/queries';
 import type { Exercise } from '@/features/exercises/types';
+import { ExerciseHowToSheet } from '@/features/exercises/components/exercise-how-to-sheet';
 import { ExerciseCard } from '@/features/training/components/exercise-card';
 import { SetTable } from '@/features/training/components/set-table';
 import { formatSets, formatWeight, sessionTotals } from '@/features/training/format';
@@ -92,6 +93,8 @@ function ActiveWorkout({ session, plan, exercises, onFinish }: ActiveWorkoutProp
     const first = session.exercises.findIndex((exercise) => exercise.status !== 'done');
     return first === -1 ? null : first;
   });
+
+  const [howTo, setHowTo] = useState<Exercise | null>(null);
 
   const exercisesById = useMemo(
     () => new Map(exercises.map((exercise) => [exercise.id, exercise])),
@@ -250,7 +253,8 @@ function ActiveWorkout({ session, plan, exercises, onFinish }: ActiveWorkoutProp
                 expanded={expanded === exerciseIndex}
                 onToggle={() =>
                   expanded === exerciseIndex ? setExpanded(null) : open(exerciseIndex)
-                }>
+                }
+                onShowHowTo={() => setHowTo(exercisesById.get(logged.exerciseId) ?? null)}>
                 {last && last.length > 0 ? (
                   <Text style={styles.lastTime}>
                     {t('session.lastTime', { sets: formatSets(last, locale) })}
@@ -273,6 +277,8 @@ function ActiveWorkout({ session, plan, exercises, onFinish }: ActiveWorkoutProp
           );
         })}
       </ScrollView>
+
+      <ExerciseHowToSheet exercise={howTo} onClose={() => setHowTo(null)} />
     </View>
   );
 }
