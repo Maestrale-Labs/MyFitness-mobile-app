@@ -31,6 +31,11 @@ export type WorkoutPlan = {
   /** Plans are a path: level 1 first, then 2, 3… Lists are sorted by it. */
   level: number;
   daysPerWeek: number;
+  /**
+   * Suggested training weekdays, 1 = Monday … 7 = Sunday, one per training day of the
+   * week. The workouts actually done show on the day they were done.
+   */
+  weekdays: number[];
   durationWeeks: number;
   /** How to spread the days over the week. */
   schedule: Localized;

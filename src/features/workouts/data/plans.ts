@@ -71,6 +71,7 @@ export const seedPlans: WorkoutPlan[] = [
     goal: 'muscleGain',
     level: 1,
     daysPerWeek: 3,
+    weekdays: [1, 3, 5],
     durationWeeks: 8,
     schedule: {
       it: 'Tre giorni non consecutivi, per esempio lunedì (giorno 1), mercoledì (giorno 2) e venerdì (giorno 3). Il giorno 3 è uguale al giorno 1.',
@@ -89,6 +90,7 @@ export const seedPlans: WorkoutPlan[] = [
     goal: 'muscleGain',
     level: 2,
     daysPerWeek: 4,
+    weekdays: [1, 2, 4, 5],
     durationWeeks: 8,
     schedule: {
       it: 'Per esempio lunedì (giorno 1), martedì (giorno 2), giovedì (giorno 3) e venerdì (giorno 4). Mercoledì e il fine settimana sono di riposo.',

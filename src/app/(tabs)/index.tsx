@@ -11,12 +11,15 @@ import { ThemedText } from '@/components/themed-text';
 import { icons } from '@/constants/icons';
 import { Radius, Spacing } from '@/constants/theme';
 import { useSettings } from '@/features/settings/store';
+import { planWeek, weekCalendar } from '@/features/training/calendar';
+import { WeekCalendar } from '@/features/training/components/week-calendar';
 import { completedWorkouts, useTraining } from '@/features/training/store';
 import { useWorkoutPlans } from '@/features/workouts/queries';
 import type { WorkoutPlan } from '@/features/workouts/types';
 import { makeStyles } from '@/hooks/use-styles';
 import { useTabBarInset } from '@/hooks/use-tab-bar-inset';
 import { useTheme } from '@/hooks/use-theme';
+import { useToday } from '@/hooks/use-today';
 import { useLocale } from '@/i18n';
 
 export default function HomeScreen() {
@@ -70,7 +73,8 @@ function ActivePlan({ plan, plans }: { plan: WorkoutPlan; plans: WorkoutPlan[] }
   const theme = useTheme();
   const locale = useLocale();
   const { t } = useTranslation();
-  const nextDayIndex = useTraining((state) => state.activePlan?.nextDayIndex ?? 0);
+  const activePlan = useTraining((state) => state.activePlan)!;
+  const history = useTraining((state) => state.history);
   const current = useTraining((state) => state.current);
   const done = useTraining(completedWorkouts);
   const startWorkout = useTraining((state) => state.startWorkout);
@@ -78,8 +82,11 @@ function ActivePlan({ plan, plans }: { plan: WorkoutPlan; plans: WorkoutPlan[] }
 
   const total = plan.daysPerWeek * plan.durationWeeks;
   const finished = done >= total;
-  const week = Math.min(Math.floor(done / plan.daysPerWeek) + 1, plan.durationWeeks);
-  const dayIndex = current?.planId === plan.id ? current.dayIndex : nextDayIndex;
+  const today = useToday();
+  const week = planWeek(activePlan, plan, today);
+  const days = weekCalendar(plan, activePlan, history, current, today);
+  const doneThisWeek = days.filter((item) => item.status === 'done').length;
+  const dayIndex = current?.planId === plan.id ? current.dayIndex : activePlan.nextDayIndex;
   const day = plan.days[dayIndex] ?? plan.days[0];
   const nextLevel = plans.find((item) => item.level === plan.level + 1);
 
@@ -119,6 +126,16 @@ function ActivePlan({ plan, plans }: { plan: WorkoutPlan; plans: WorkoutPlan[] }
               {t('home.workoutsDone', { done: Math.min(done, total), total })}
             </Text>
           </View>
+        </View>
+      </Card>
+
+      <SectionLabel>{t('home.thisWeek')}</SectionLabel>
+      <Card>
+        <View style={styles.weekCard}>
+          <WeekCalendar days={days} />
+          <Text style={[styles.meta, styles.centered]}>
+            {t('home.weekCount', { done: doneThisWeek, total: plan.daysPerWeek })}
+          </Text>
         </View>
       </Card>
 
@@ -253,6 +270,10 @@ const useStyles = makeStyles((theme) => ({
     fontSize: 15,
     lineHeight: 21,
     color: theme.textSecondary,
+  },
+  weekCard: {
+    gap: Spacing.two,
+    padding: Spacing.three,
   },
   planCard: {
     gap: Spacing.three,
