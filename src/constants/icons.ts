@@ -2,7 +2,6 @@
 // Stroke Rounded style, as in Paniere. Icons are picked here only, so swapping one
 // never touches the screens.
 import {
-  ArrowDataTransferHorizontalIcon,
   ArrowLeft01Icon,
   ArrowRight01Icon,
   Award01Icon,
@@ -21,14 +20,11 @@ import {
   Home01Icon,
   Idea01Icon,
   InformationCircleIcon,
-  MinusSignIcon,
   Message01Icon,
   MoreHorizontalCircle01Icon,
   Moon02Icon,
-  NextIcon,
   PencilEdit02Icon,
   PlayIcon,
-  PlusSignIcon,
   Search01Icon,
   Shield01Icon,
   SmartPhone01Icon,
@@ -37,7 +33,6 @@ import {
   Target02Icon,
   TaskDaily01Icon,
   Tick02Icon,
-  Timer01Icon,
   UserIcon,
   WorkoutRunIcon,
 } from '@hugeicons/core-free-icons';
@@ -70,13 +65,6 @@ export const icons = {
   // training
   start: PlayIcon,
   setDone: Tick02Icon,
-  addSet: PlusSignIcon,
-  removeSet: MinusSignIcon,
-  increase: PlusSignIcon,
-  decrease: MinusSignIcon,
-  swap: ArrowDataTransferHorizontalIcon,
-  skip: NextIcon,
-  rest: Timer01Icon,
   completed: Award01Icon,
   // profile
   user: UserIcon,

@@ -148,18 +148,16 @@ Deciso con Valerio il 31 ottobre 2026. Tutto resta **sul telefono** (zustand con
   - con una scheda: livello e nome, una barra di avanzamento («Settimana 2 di 8», «4 di 24 allenamenti»), il prossimo allenamento (Giorno N, muscoli, numero di esercizi) con «Inizia allenamento» o «Riprendi allenamento», e gli ultimi 3 allenamenti fatti;
   - a scheda finita: «Scheda completata!», con «Passa al livello N+1» e «Ripeti la scheda».
 - **Durata e avanzamento:** una scheda vale *giorni a settimana × settimane* allenamenti (24 per il livello 1). L'avanzamento conta gli allenamenti fatti, non i giorni del calendario: se salti una settimana non perdi niente. I giorni si susseguono (1, 2, 3, poi di nuovo 1).
-- **Allenamento** (`src/app/workout.tsx`, a schermo intero), **una serie alla volta** (rivisto il 31 ottobre 2026 su richiesta di Valerio, dopo averlo provato sull'iPhone):
-  - in alto l'esercizio (animazione piccola, nome, obiettivo come «3 × 10–12 · recupero 90 s», cosa hai fatto l'ultima volta);
-  - al centro la serie in corso («Serie 2 di 3») con **kg** e **ripetizioni** da regolare con − e + (2,5 kg e 1 ripetizione per volta) o da scrivere. Le ripetizioni partono già impostate: quelle dell'ultima volta o, la prima volta, il massimo dell'obiettivo (12 se l'obiettivo è 10–12). Il peso parte da quello dell'ultima volta; fatta una serie, passa alle successive ancora vuote;
-  - **Serie fatta** apre il **recupero**: un timer che conta alla rovescia e, finito il tempo, continua a contare in avanti («+0:12») finché non premi **Prosegui**. C'è anche «+30 s». Dopo l'ultima serie il recupero porta all'esercizio successivo;
-  - sotto c'è l'elenco delle serie: quelle fatte con i valori, la corrente evidenziata. Toccando una serie fatta la si riapre per correggerla;
-  - **Aggiungi serie** e **Rimuovi serie** (toglie l'ultima serie non ancora fatta; ne resta almeno una);
-  - se l'ultima volta hai fatto tutte le ripetizioni in ogni serie, l'app suggerisce di aumentare il peso: è la **progressione**;
-  - si può **cambiare** esercizio (con un altro dello stesso gruppo muscolare), **saltarlo**, e saltare da un esercizio all'altro con la barra in alto;
-  - «Termina» salva e mostra il riepilogo (esercizi, serie, kg sollevati). Un allenamento senza nessuna serie fatta non viene salvato e non conta;
-  - se esci a metà resta in pausa e si riprende dalla Home, anche dopo aver chiuso l'app.
+- **Allenamento** (`src/app/workout.tsx`, a schermo intero). Dopo due prove sull'iPhone Valerio ha chiesto di **partire semplici** e aggiungere funzioni più avanti (31 ottobre 2026):
+  - in alto c'è la **striscia degli esercizi del giorno**: si vede tutta la scheda, anche durante il recupero, e toccandone uno si apre. Quelli completati hanno la spunta;
+  - sotto, l'esercizio selezionato (animazione, obiettivo, cosa hai fatto l'ultima volta) e la **tabella delle serie**: per ogni serie kg, ripetizioni e la spunta. Le ripetizioni partono già impostate (quelle dell'ultima volta o il massimo dell'obiettivo), il peso da quello dell'ultima volta; spuntata una serie, il suo peso passa alle successive ancora vuote;
+  - **niente bottoni «avanti»**: spuntata l'ultima serie, l'esercizio risulta completato e l'app passa da sola al successivo; spuntata l'ultima serie dell'ultimo esercizio, l'allenamento si chiude da solo con il riepilogo (esercizi, serie, kg sollevati);
+  - si può tornare su un esercizio fatto per vedere i risultati o correggerli (togliendo la spunta l'esercizio torna da completare);
+  - «Termina» in alto chiude prima (gli esercizi senza serie fatte contano come saltati); la X esce e lascia l'allenamento in pausa, da riprendere dalla Home anche dopo aver chiuso l'app. Un allenamento senza nessuna serie fatta non viene salvato;
+  - se l'ultima volta hai fatto tutte le ripetizioni in ogni serie, l'app suggerisce di aumentare il peso (**progressione**);
+  - **tolti per ora**: timer di recupero, cambia/salta esercizio, aggiungi/rimuovi serie, annulla allenamento. Si rimettono se servono.
 - **Statistiche:** `plan_added`, `workout_started`, `workout_completed`, `plan_completed` (vedi `docs/analytics.md`).
-- **Da fare:** storico dei pesi per esercizio (grafico dei progressi), diario, livelli successivi, promemoria con le notifiche.
+- **Da fare:** vedere dalla Home i risultati di un allenamento fatto, storico dei pesi per esercizio (grafico dei progressi), livelli successivi, promemoria con le notifiche; eventualmente rimettere timer di recupero e cambio esercizio.
 
 ### Profilo
 
@@ -248,6 +246,7 @@ Deciso con Valerio il 31 ottobre 2026. Tutto resta **sul telefono** (zustand con
 15. **MaestraleGym ovunque.** Valerio chiede di usare il nuovo nome dappertutto. Si rinominano il repository GitHub, il progetto Expo (nuovo `@maestrale-lab/maestralegym`), slug, scheme, pacchetto npm e la sessione di lavoro; l'Apple ID dell'app va in `eas.json`. Valerio rinomina anche il progetto Supabase dalla dashboard.
 16. **Percorso e allenamento.** Valerio vuole poter scegliere una scheda e allenarsi davvero. Nuova barra Home · Esercizi · Profilo; le schede diventano livelli e finiscono nella tab Esercizi (vista Schede); dalla Home si avvia l'allenamento, un esercizio alla volta, con pesi e ripetizioni che ripartono dall'ultima volta.
 17. **Una serie alla volta.** Provando l'allenamento sull'iPhone, Valerio nota che una serie aggiunta per sbaglio non si può togliere, e chiede un flusso diverso: kg e ripetizioni già impostate, «avanti», recupero che continua a contare se ci si riposa di più, poi la serie successiva. Si rifà la schermata così e si aggiunge «Rimuovi serie».
+18. **Più semplice.** Anche la versione una serie alla volta è troppo complessa per Valerio. Si riparte dall'essenziale: striscia degli esercizi in alto, tabella delle serie con kg, ripetizioni e spunta, passaggio automatico all'esercizio successivo e chiusura automatica a fine allenamento; via timer e bottoni extra.
 
 ### Richiesta iniziale (testo integrale)
 

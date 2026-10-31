@@ -7,7 +7,7 @@ import { createJSONStorage, persist } from 'zustand/middleware';
 import { track } from '@/features/analytics/client';
 import type { WorkoutPlan } from '@/features/workouts/types';
 
-import type { ActivePlan, LoggedSet, WorkoutSession } from './types';
+import type { ActivePlan, LoggedExercise, LoggedSet, WorkoutSession } from './types';
 
 type TrainingState = {
   activePlan: ActivePlan | null;
@@ -19,12 +19,7 @@ type TrainingState = {
   leavePlan: () => void;
   startWorkout: (plan: WorkoutPlan) => void;
   updateSet: (exerciseIndex: number, setIndex: number, patch: Partial<LoggedSet>) => void;
-  addSet: (exerciseIndex: number) => void;
-  /** Removes the last set not done yet; an exercise keeps at least one set. */
-  removeSet: (exerciseIndex: number) => void;
-  completeExercise: (exerciseIndex: number) => void;
-  skipExercise: (exerciseIndex: number) => void;
-  swapExercise: (exerciseIndex: number, exerciseId: string, defaultReps: number) => void;
+  setExerciseStatus: (exerciseIndex: number, status: LoggedExercise['status']) => void;
   /**
    * Saves the workout and moves on to the next day. Returns the saved workout, or null
    * when no set was ticked: an empty workout is dropped and doesn't count.
@@ -152,48 +147,9 @@ export const useTraining = create<TrainingState>()(
           })),
         ),
 
-      addSet: (exerciseIndex) =>
+      setExerciseStatus: (exerciseIndex, status) =>
         set((state) =>
-          updateCurrent(state, exerciseIndex, (exercise) => {
-            const last = exercise.sets[exercise.sets.length - 1];
-            return {
-              ...exercise,
-              sets: [
-                ...exercise.sets,
-                { weightKg: last?.weightKg ?? null, reps: last?.reps ?? null, done: false },
-              ],
-            };
-          }),
-        ),
-
-      removeSet: (exerciseIndex) =>
-        set((state) =>
-          updateCurrent(state, exerciseIndex, (exercise) => {
-            const index = exercise.sets.findLastIndex((item) => !item.done);
-            if (index === -1 || exercise.sets.length <= 1) {
-              return exercise;
-            }
-            return { ...exercise, sets: exercise.sets.filter((_, i) => i !== index) };
-          }),
-        ),
-
-      completeExercise: (exerciseIndex) =>
-        set((state) =>
-          updateCurrent(state, exerciseIndex, (exercise) => ({ ...exercise, status: 'done' })),
-        ),
-
-      skipExercise: (exerciseIndex) =>
-        set((state) =>
-          updateCurrent(state, exerciseIndex, (exercise) => ({ ...exercise, status: 'skipped' })),
-        ),
-
-      swapExercise: (exerciseIndex, exerciseId, defaultReps) =>
-        set((state) =>
-          updateCurrent(state, exerciseIndex, (exercise) => ({
-            ...exercise,
-            exerciseId,
-            sets: prefilledSets(state.history, exerciseId, exercise.sets.length, defaultReps),
-          })),
+          updateCurrent(state, exerciseIndex, (exercise) => ({ ...exercise, status })),
         ),
 
       finishWorkout: (plan) => {
